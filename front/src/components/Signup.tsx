@@ -96,6 +96,8 @@ const Signup = () => {
           console.log(err);
           alert("An error occurred. Please try again.");
         });
+    } else {
+      alert("Please upload an image");
     }
   };
 

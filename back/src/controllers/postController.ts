@@ -37,6 +37,34 @@ class PostController extends BaseController<typeof PostModel> {
       res.status(500).json({ message: "Internal Server Error" });
     }
   }
+
+  async updateItemById(req: Request, res: Response) {
+    try {
+      const id = req.params.id;
+      const userId = req.params.userId;
+      const { title, content } = req.body;
+      let photo = req.body.photo;
+      if (!title && !content && !photo) {
+        res.status(400).send("No data to update");
+        return;
+      }
+      if (photo && photo.includes("blob:")) {
+        photo = photo.replace("blob:", "");
+      }
+      const updatedItem = await PostModel.findById(id);
+      if (!updatedItem) {
+        res.status(404).send("Post not found");
+        return;
+      }
+      updatedItem.title = title;
+      updatedItem.content = content;
+      updatedItem.photo = photo;
+      await updatedItem.save();
+      res.status(200).send(updatedItem);
+    } catch (error) {
+      res.status(500).send(error);
+    }
+  }
 }
 
 export default new PostController();

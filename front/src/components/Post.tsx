@@ -198,8 +198,8 @@ const Post: FC<PostProps> = ({
       });
   };
 
-  const handleViewPost = (_id: string) => {
-    navigate(`/viewPost/${_id}`);
+  const handleEditPost = (_id: string) => {
+    navigate(`/editPost/${_id}`);
   };
 
   return (
@@ -220,7 +220,7 @@ const Post: FC<PostProps> = ({
         {userName === ownerName && (
           <span
             className="ms-2 text-primary cursor-pointer"
-            onClick={() => handleViewPost(_id)}
+            onClick={() => handleEditPost(_id)}
           >
             Edit
           </span>

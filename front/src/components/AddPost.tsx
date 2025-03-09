@@ -11,8 +11,8 @@ type AddPostProps = {
 };
 
 const apiClient = axios.create({
-    baseURL: "http://localhost:3000",
-  });
+  baseURL: "http://localhost:3000",
+});
 
 const schema = z.object({
   title: z.string().nonempty("Must have title"),
@@ -21,7 +21,7 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-const AddPost:FC<AddPostProps> = ({userName, profileImageUrl}) => {
+const AddPost: FC<AddPostProps> = ({ userName, profileImageUrl }) => {
   const [image, setImage] = useState<File | null>(null);
 
   const {
@@ -64,21 +64,21 @@ const AddPost:FC<AddPostProps> = ({userName, profileImageUrl}) => {
             photo: url,
             ownerName: userName,
             ownerPhoto: profileImageUrl,
-          }
+          };
           axios
             .post("http://localhost:3000/posts", newPostData, {
-                withCredentials: true,
-                headers: {
-                    Authorization: `Bearer ${
-                    document.cookie.split("accessToken=")[1].split(";")[0]
-                    }`,
-                },
+              withCredentials: true,
+              headers: {
+                Authorization: `Bearer ${
+                  document.cookie.split("accessToken=")[1].split(";")[0]
+                }`,
+              },
             })
             .then((response) => {
               console.log(response);
               if (response.status === 201) {
                 alert("Post created successfully");
-                window.location.reload()
+                window.location.reload();
               }
             })
             .catch((error) => {
@@ -96,60 +96,72 @@ const AddPost:FC<AddPostProps> = ({userName, profileImageUrl}) => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="container p-4 shadow rounded bg-light">
-  {/* Profile Image */}
-  <div className="mb-3 text-center">
-    <div className="position-relative d-flex justify-content-center">
-      <img
-        src={image ? URL.createObjectURL(image) : avatar}
-        alt="Preview"
-        className="border-secondary shadow-sm"
-        style={{ width: "200px", height: "200px", objectFit: "cover" }}
-      />
-    </div>
-  </div>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="container p-4 shadow rounded bg-light"
+    >
+      {/* Profile Image */}
+      <div className="mb-3 text-center">
+        <div className="position-relative d-flex justify-content-center">
+          <img
+            src={image ? URL.createObjectURL(image) : avatar}
+            alt="Preview"
+            className="border-secondary shadow-sm"
+            style={{ width: "200px", height: "200px", objectFit: "cover" }}
+          />
+        </div>
+      </div>
 
-  {/* File Upload */}
-  <div className="mb-3 text-center">
-    <label className="form-label fw-bold">Upload Image</label>
-    <input
-      type="file"
-      className="form-control"
-      accept="image/jpeg, image/png"
-      onChange={changeImage}
-    />
-  </div>
+      {/* File Upload */}
+      <div className="mb-3 text-center">
+        <label className="form-label fw-bold">Upload Image</label>
+        <input
+          type="file"
+          className="form-control"
+          accept="image/jpeg, image/png"
+          onChange={changeImage}
+        />
+      </div>
 
-  {/* Title Input */}
-  <div className="mb-3">
-    <label htmlFor="title" className="form-label fw-bold">Enter Title</label>
-    <input
-      type="text"
-      id="title"
-      placeholder="Enter title"
-      {...register("title")}
-      className={`form-control ${errors.title ? "is-invalid" : ""}`}
-    />
-    {errors.title && <div className="invalid-feedback">{errors.title.message}</div>}
-  </div>
+      {/* Title Input */}
+      <div className="mb-3">
+        <label htmlFor="title" className="form-label fw-bold">
+          Enter Title
+        </label>
+        <input
+          type="text"
+          id="title"
+          placeholder="Enter title"
+          {...register("title")}
+          className={`form-control ${errors.title ? "is-invalid" : ""}`}
+        />
+        {errors.title && (
+          <div className="invalid-feedback">{errors.title.message}</div>
+        )}
+      </div>
 
-  {/* Caption Input */}
-  <div className="mb-3">
-    <label htmlFor="content" className="form-label fw-bold">Caption</label>
-    <input
-      type="text"
-      id="content"
-      placeholder="Enter caption"
-      {...register("content")}
-      className={`form-control ${errors.content ? "is-invalid" : ""}`}
-    />
-    {errors.content && <div className="invalid-feedback">{errors.content.message}</div>}
-  </div>
+      {/* Caption Input */}
+      <div className="mb-3">
+        <label htmlFor="content" className="form-label fw-bold">
+          Caption
+        </label>
+        <input
+          type="text"
+          id="content"
+          placeholder="Enter caption"
+          {...register("content")}
+          className={`form-control ${errors.content ? "is-invalid" : ""}`}
+        />
+        {errors.content && (
+          <div className="invalid-feedback">{errors.content.message}</div>
+        )}
+      </div>
 
-  {/* Submit Button */}
-  <button type="submit" className="btn btn-primary w-100 mt-3">Post</button>
-</form>
-
+      {/* Submit Button */}
+      <button type="submit" className="btn btn-primary w-100 mt-3">
+        Post
+      </button>
+    </form>
   );
 };
 

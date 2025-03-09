@@ -113,23 +113,27 @@ const HomePage = () => {
       {/* Pagination Controls */}
       <div className="d-flex justify-content-center mt-3" style={{margin:"5px 0"}}>
         {currentPage > 1 && currentPage <= totalPages &&(
-          <button
+          <a href="#top" className="">
+            <button
           className="btn btn-primary me-2"
           disabled={currentPage === 1}
           onClick={() => setCurrentPage((prev) => prev - 1)}
         >
           Load Previous
         </button>
+          </a>
         )}
 
         {currentPage < totalPages && (
-          <button
+          <a href="#top" className="">
+            <button
           className="btn btn-primary"
           disabled={currentPage >= totalPages}
           onClick={() => setCurrentPage((prev) => prev + 1)}
         >
           Load More
         </button>
+          </a>
         )}
       </div>
     </div>
