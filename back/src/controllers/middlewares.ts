@@ -87,6 +87,21 @@ export const postDeleteMiddleware = async (
 ): Promise<void> => {
   try {
     const postId = req.params.id;
+    const password = req.body.password;
+    if (!password) {
+      res.status(404).send("Password is required");
+      return;
+    }
+    const user = await UserModel.findById(req.params.userId);
+    if (!user) {
+      res.status(404).send("User not found");
+      return;
+    }
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) {
+      res.status(402).send("Invalid password");
+      return;
+    }
     const comments = await CommentModel.find({ postId: postId });
     if (comments.length > 0) {
       await CommentModel.deleteMany({ postId: postId });
