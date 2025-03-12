@@ -40,7 +40,6 @@ export const commentEditMiddleware = async (
 ): Promise<void> => {
   try {
     const userId = req.params.userId;
-    const userName = req.params.userName;
     const commentId = req.params.id;
     const comment = await CommentModel.findById({ _id: commentId });
     if (!comment) {
