@@ -126,7 +126,7 @@ const AddPost: FC<AddPostProps> = ({ userName, profileImageUrl }) => {
       {/* Title Input */}
       <div className="mb-3">
         <label htmlFor="title" className="form-label fw-bold">
-          Enter Title
+          Enter Title (location)
         </label>
         <input
           type="text"

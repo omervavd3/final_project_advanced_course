@@ -51,6 +51,8 @@ const EditUser = () => {
   );
   const [showPreviousPassword, setShowPreviousPassword] = useState(false);
   const [userPosts, setUserPosts] = useState<Post[]>([]);
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
+  const [passwordForDelete, setPasswordForDelete] = useState<string>("");
 
   const togglePreviousPasswordVisibility = () => {
     setShowPreviousPassword((prev) => !prev);
@@ -171,12 +173,42 @@ const EditUser = () => {
       });
   };
 
+  const handleDeleteUser = async () => {
+    await axios
+      .delete("http://localhost:3000/auth/deleteUser", {
+        data: { password: passwordForDelete },
+        headers: {
+          Authorization: `Bearer ${
+            document.cookie.split("accessToken=")[1].split(";")[0]
+          }`,
+        },
+        withCredentials: true,
+      })
+      .then((response) => {
+        console.log(response);
+        if (response.status === 200) {
+          alert("User deleted successfully");
+          navigate("/");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        alert("An error occurred. Please try again.");
+      });
+  };
+
   return (
     <div className="container mt-4">
       <div className="text-center mb-4">
         <h1 className="fw-bold">@{userName}</h1>
         <button className="btn btn-secondary" onClick={() => navigate("/")}>
           Back to home page
+        </button>
+        <button
+          className="btn btn-danger"
+          onClick={() => setShowDeleteModal(true)}
+        >
+          Delete user
         </button>
       </div>
 
@@ -337,6 +369,58 @@ const EditUser = () => {
             <p className="text-muted">No posts available</p>
           </div>
         )}
+      </div>
+
+      {/* Delete Confirmation Modal */}
+      <div
+        className={`modal ${showDeleteModal ? "d-block" : "d-none"}`}
+        tabIndex={-1}
+        aria-labelledby="deleteModalLabel"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title" id="deleteModalLabel">
+                Confirm Deletion
+              </h5>
+              <button
+                type="button"
+                className="btn-close"
+                onClick={() => setShowDeleteModal(false)}
+                aria-label="Close"
+              ></button>
+            </div>
+            <div className="modal-body">
+              <label htmlFor="password" className="form-label">
+                Enter Password to Delete
+              </label>
+              <input
+                type="password"
+                id="password"
+                className="form-control"
+                value={passwordForDelete}
+                onChange={(e) => setPasswordForDelete(e.target.value)}
+              />
+            </div>
+            <div className="modal-footer">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setShowDeleteModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={handleDeleteUser}
+              >
+                Confirm Deletion
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

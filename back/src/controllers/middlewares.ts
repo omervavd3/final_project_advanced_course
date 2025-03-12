@@ -4,6 +4,44 @@ import CommentModel from "../models/commentsModel";
 import PostModel from "../models/postModel";
 import UserModel from "../models/userModel";
 import bcrypt from "bcrypt";
+import { deleteFile } from "./multerController";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+
+export const deleteImageMiddleware = async (
+  filename: string
+): Promise<boolean> => {
+  try {
+    if (!filename) {
+      return false;
+    }
+    let fileName = filename;
+    let filePath = path.join(__dirname, "../public", fileName);
+
+    filePath = filePath.replace("src\\", "").replace(/\\/g, "/");
+
+    console.log("File path to delete:", filePath);
+
+    fs.exists(filePath, (exists) => {
+      if (!exists) {
+        return false;
+      }
+
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.log("Error deleting file:", err);
+          return false;
+        }
+        console.log("File deleted successfully");
+        return true;
+      });
+    });
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
 
 export const commentDeleteMiddleware = async (
   req: Request,
@@ -64,6 +102,7 @@ export const postMiddleware = async (
   try {
     const userId = req.params.userId;
     const postId = req.params.id;
+    const photo = req.body.photo;
     const post = await PostModel.findById(postId);
     if (!post) {
       res.status(404).send("Post not found");
@@ -72,6 +111,17 @@ export const postMiddleware = async (
     if (post.owner !== userId) {
       res.status(403).send("Unauthorized");
       return;
+    }
+    if (photo) {
+      const photoForDelte = post.photo;
+      if (photoForDelte) {
+        const fileName = photoForDelte.split("/").pop() || "";
+        const imageDelte = await deleteImageMiddleware(fileName);
+        if (!imageDelte) {
+          res.status(500).send("Error deleting image");
+          return;
+        }
+      }
     }
     next();
   } catch (error) {
@@ -100,6 +150,20 @@ export const postDeleteMiddleware = async (
     if (!valid) {
       res.status(402).send("Invalid password");
       return;
+    }
+    const post = await PostModel.findById(postId);
+    if (!post) {
+      res.status(404).send("Post not found");
+      return;
+    }
+    const photo = post.photo;
+    if (photo) {
+      const fileName = photo.split("/").pop() || "";
+      const imageDelete = await deleteImageMiddleware(fileName);
+      if (imageDelete == false) {
+        res.status(500).send("Error deleting image");
+        return;
+      }
     }
     const comments = await CommentModel.find({ postId: postId });
     if (comments.length > 0) {
@@ -138,6 +202,15 @@ export const authUpdateMiddleWare = async (
       return;
     }
     if (profileImageUrl) {
+      const profileImageUrlForDelete = user.profileImageUrl;
+      if (profileImageUrlForDelete) {
+        const fileName = profileImageUrlForDelete.split("/").pop() || "";
+        const imageDelete = await deleteImageMiddleware(fileName);
+        if (!imageDelete) {
+          res.status(500).send("Error deleting image");
+          return;
+        }
+      }
       const posts = await PostModel.find({ owner: userId });
       if (posts.length > 0) {
         posts.forEach(async (post) => {
@@ -146,7 +219,7 @@ export const authUpdateMiddleWare = async (
         });
       }
     }
-    if(userName){
+    if (userName) {
       const posts = await PostModel.find({ owner: userId });
       if (posts.length > 0) {
         posts.forEach(async (post) => {
@@ -214,16 +287,41 @@ export const authDeleteMiddleware = async (
       res.status(402).send("Invalid password");
       return;
     }
+    const profileImageUrlForDelete = user.profileImageUrl;
+    if (profileImageUrlForDelete) {
+      const fileName = profileImageUrlForDelete.split("/").pop() || "";
+      const imageDelete = await deleteImageMiddleware(fileName);
+      if (!imageDelete) {
+        res.status(500).send("Error deleting image");
+        return;
+      }
+    }
     const comments = await CommentModel.find({ owner: userId });
     if (comments.length > 0) {
       await CommentModel.deleteMany({ owner: userId });
     }
     const posts = await PostModel.find({ owner: userId });
     if (posts.length > 0) {
+      posts.forEach(async (post) => {
+        const photo = post.photo;
+        if (photo) {
+          const fileName = photo.split("/").pop() || "";
+          const imageDelete = await deleteImageMiddleware(fileName);
+          if (!imageDelete) {
+            res.status(500).send("Error deleting image");
+            return;
+          }
+        }
+      });
       await PostModel.deleteMany({ owner: userId });
     }
     const likes = await LikesModel.find({ owner: userId });
     if (likes.length > 0) {
+      likes.forEach(async (like) => {
+        const post = await PostModel.find({ _id: like.postId });
+        post[0].likes -= 1;
+        await post[0].save();
+      });
       await LikesModel.deleteMany({ owner: userId });
     }
     next();

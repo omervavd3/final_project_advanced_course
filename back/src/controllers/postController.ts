@@ -40,7 +40,6 @@ class PostController extends BaseController<typeof PostModel> {
   async updateItemById(req: Request, res: Response) {
     try {
       const id = req.params.id;
-      const userId = req.params.userId;
       const { title, content } = req.body;
       let photo = req.body.photo;
       if (!title && !content && !photo) {
