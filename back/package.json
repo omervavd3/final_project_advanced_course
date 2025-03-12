@@ -9,6 +9,7 @@
     "postsTest": "jest --detectOpenHandles --coverage --forceExit --testPathPattern=posts",
     "authTest": "jest --detectOpenHandles --coverage --forceExit --testPathPattern=auth",
     "commentsTest": "jest --detectOpenHandles --coverage --forceExit --testPathPattern=comments",
+    "likesTest": "jest --detectOpenHandles --coverage --forceExit --testPathPattern=likes",
     "multerTest": "jest --detectOpenHandles --coverage --forceExit --testPathPattern=multer",
     "test": "jest --detectOpenHandles --coverage --forceExit"
   },
