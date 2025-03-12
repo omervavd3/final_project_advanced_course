@@ -52,9 +52,10 @@ export const deleteFile = (req: Request, res: Response) => {
 
       fs.unlink(filePath, (err) => {
         if (err) {
+          console.log("Error deleting file:", err);
           return res.status(500).send("Error deleting file");
         }
-
+        console.log("File deleted successfully")
         res.status(200).send("File deleted successfully");
       });
     });

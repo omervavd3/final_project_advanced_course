@@ -320,7 +320,13 @@ const getUserInfo = async (req: Request, res: Response) => {
       res.status(404).send("User not found");
       return;
     }
-    res.status(200).send({userName: user.userName, email: user.email, profileImageUrl: user.profileImageUrl});
+    res
+      .status(200)
+      .send({
+        userName: user.userName,
+        email: user.email,
+        profileImageUrl: user.profileImageUrl,
+      });
   } catch (error) {
     res.status(500).send(error);
   }
@@ -335,6 +341,8 @@ const deleteUser = async (req: Request, res: Response) => {
       return;
     }
     await UserModel.deleteOne({ _id: _id });
+    res.clearCookie("refreshToken");
+    res.clearCookie("accessToken");
     res.status(200).send("User deleted");
   } catch (error) {
     res.status(500).send(error);
