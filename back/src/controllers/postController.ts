@@ -33,8 +33,7 @@ class PostController extends BaseController<typeof PostModel> {
         totalPosts,
       });
     } catch (error) {
-      console.error("Error fetching paginated posts:", error);
-      res.status(500).json({ message: "Internal Server Error" });
+      res.status(500).send(error);
     }
   }
 

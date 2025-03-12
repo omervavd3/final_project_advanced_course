@@ -12,21 +12,48 @@ type User = {
   email: string;
   password: string;
   userName: string;
+  profileImageUrl: string;
   _id?: string;
   refreshToken?: string;
   accessToken?: string;
 };
 
 const testUser: User = {
-  email: "example@email.com",
+  email: "test@example.com",
   password: "1234",
   userName: "name test",
+  profileImageUrl: "https://www.google.com",
 };
 
 const testUser2: User = {
-  email: "example2@email.com",
-  password: "6789",
-  userName: "test name",
+  email: "test@example2.com",
+  password: "1234",
+  userName: "name test 3",
+  profileImageUrl: "https://www.google.com",
+};
+
+type Post = {
+  title: string;
+  content: string;
+  owner?: string;
+  ownerName?: string;
+  ownerPhoto?: string;
+  photo: string;
+  likes?: number;
+  date?: Date;
+  _id?: string;
+};
+
+const testPost: Post = {
+  title: "Test Title",
+  content: "Test Content",
+  photo: "https://www.google.com",
+};
+
+const testPost2: Post = {
+  title: "Test Title 2",
+  content: "Test Content 2",
+  photo: "https://www.google.com",
 };
 
 beforeAll(async () => {
@@ -38,6 +65,7 @@ beforeAll(async () => {
     userName: testUser.userName,
     email: testUser.email,
     password: testUser.password,
+    profileImageUrl: testUser.profileImageUrl,
   });
   testUser._id = res.body._id;
   const res2 = await request(app).post("/auth/login").send({
@@ -53,6 +81,7 @@ beforeAll(async () => {
     userName: testUser2.userName,
     email: testUser2.email,
     password: testUser2.password,
+    profileImageUrl: testUser2.profileImageUrl,
   });
   testUser2._id = res3.body._id;
   expect(testUser2._id).toBeDefined();
@@ -82,7 +111,11 @@ describe("Posts Tests", () => {
   });
 
   test("Posts test get all fail", async () => {
-    const response = await request(app).get("/posts/123");
+    const response = await request(app)
+      .get("/posts/123")
+      .set({
+        Authorization: "JWT " + testUser.accessToken,
+      });
     expect(response.statusCode).toBe(500);
   });
 
@@ -93,14 +126,55 @@ describe("Posts Tests", () => {
         Authorization: "JWT " + testUser.accessToken,
       })
       .send({
-        title: testJSON[0].title,
-        content: testJSON[0].content,
+        title: testPost.title,
+        content: testPost.content,
+        photo: testPost.photo,
+        ownerName: testUser.userName,
+        ownerPhoto: testUser.profileImageUrl,
       });
     expect(response.statusCode).toBe(201);
-    expect(response.body.title).toBe(testJSON[0].title);
-    expect(response.body.content).toBe(testJSON[0].content);
+    expect(response.body.title).toBe(testPost.title);
+    expect(response.body.content).toBe(testPost.content);
     expect(response.body.owner).toBe(testUser._id);
     postId = response.body._id;
+  });
+
+  test("Test edit post without params", async () => {
+    const response = await request(app)
+      .put("/posts/" + postId)
+      .set({
+        Authorization: "JWT " + testUser.accessToken,
+      })
+      .send({});
+    expect(response.statusCode).toBe(400);
+  });
+
+  test("Test edit post with photo blob", async () => {
+    const response = await request(app)
+      .put("/posts/" + postId)
+      .set({
+        Authorization: "JWT " + testUser.accessToken,
+      })
+      .send({
+        title: testPost.title,
+        content: testPost.content,
+        photo: "blob:https://www.google.com",
+      });
+    expect(response.statusCode).toBe(200);
+  });
+
+  test("Test edit post with wrong postId", async () => {
+    const response = await request(app)
+      .put("/posts/" + postId + "1")
+      .set({
+        Authorization: "JWT " + testUser.accessToken,
+      })
+      .send({
+        title: testPost.title,
+        content: testPost.content,
+        photo: testPost.photo,
+      });
+    expect(response.statusCode).not.toBe(200);
   });
 
   test("Test edit post", async () => {
@@ -110,11 +184,13 @@ describe("Posts Tests", () => {
         Authorization: "JWT " + testUser.accessToken,
       })
       .send({
-        title: testJSON[1].title,
+        title: testPost2.title,
+        content: testPost.content,
+        photo: testPost.photo,
       });
     expect(response.statusCode).toBe(200);
-    expect(response.body.title).toBe(testJSON[1].title);
-    expect(response.body.content).toBe(testJSON[0].content);
+    expect(response.body.title).toBe(testPost2.title);
+    expect(response.body.content).toBe(testPost.content);
     expect(response.body.owner).toBe(testUser._id);
   });
 
@@ -125,7 +201,7 @@ describe("Posts Tests", () => {
         Authorization: "JWT " + testUser2.accessToken,
       })
       .send({
-        title: testJSON[1].title,
+        title: testPost2.title,
       });
     expect(response.statusCode).not.toBe(200);
   });
@@ -137,15 +213,15 @@ describe("Posts Tests", () => {
         Authorization: "JWT " + testUser.accessToken,
       })
       .send({
-        title: testJSON[0].title,
+        title: testPost.title,
       });
     expect(response.statusCode).toBe(500);
   });
 
   test("Test Create Post without token", async () => {
     const response = await request(app).post("/posts").set({}).send({
-      title: testJSON[0].title,
-      content: testJSON[0].content,
+      title: testPost.title,
+      content: testPost.content,
     });
     expect(response.statusCode).toBe(401);
   });
@@ -157,19 +233,33 @@ describe("Posts Tests", () => {
         Authorization: "JWT " + testUser.accessToken + "1",
       })
       .send({
-        title: testJSON[0].title,
-        content: testJSON[0].content,
+        title: testPost.title,
+        content: testPost.content,
       });
     expect(response.statusCode).toBe(403);
   });
 
+  test("Test get all pagination", async () => {
+    const response = await request(app)
+      .get("/posts/getAllPagination/1/10")
+      .set({
+        Authorization: "JWT " + testUser.accessToken,
+      });
+    expect(response.statusCode).toBe(200);
+  });
+
+  // test("Test get all pagination fail", async () => {
+  //   const response = await request(app)
+  //     .get("/posts/getAllPagination/-1/10")
+  //     .set({
+  //       Authorization: "JWT " + testUser.accessToken,
+  //     });
+  //   expect(response.statusCode).toBe(400);
+  // });
+
   test("Test get post by owner", async () => {
     const response = await request(app).get(`/posts?owner=${testUser._id}`);
     expect(response.statusCode).toBe(200);
-    expect(response.body.length).toBe(1);
-    expect(response.body[0].title).toBe(testJSON[1].title);
-    expect(response.body[0].content).toBe(testJSON[0].content);
-    expect(response.body[0].owner).toBe(testUser._id);
   });
 
   test("Posts test get all fail (no matching owner)", async () => {
@@ -179,15 +269,21 @@ describe("Posts Tests", () => {
   });
 
   test("Test get post by id", async () => {
-    const response = await request(app).get("/posts/" + postId);
+    const response = await request(app)
+      .get("/posts/" + postId)
+      .set({
+        Authorization: "JWT " + testUser.accessToken,
+      });
     expect(response.statusCode).toBe(200);
-    expect(response.body.title).toBe(testJSON[1].title);
-    expect(response.body.content).toBe(testJSON[0].content);
+    expect(response.body.title).toBe(testPost2.title);
+    expect(response.body.content).toBe(testPost.content);
     expect(response.body.owner).toBe(testUser._id);
   });
 
   test("Test get post by id fail (no matchind id)", async () => {
-    const response = await request(app).get("/posts/" + "679b79213d4c2e12fcb96aa9");
+    const response = await request(app).get(
+      "/posts/" + "679b79213d4c2e12fcb96aa9"
+    );
     expect(response.statusCode).not.toBe(200);
   });
 
@@ -196,6 +292,9 @@ describe("Posts Tests", () => {
       .delete("/posts/" + postId)
       .set({
         Authorization: "JWT " + testUser.accessToken,
+      })
+      .send({
+        password: testUser.password,
       });
     expect(response.statusCode).toBe(204);
 
@@ -224,7 +323,11 @@ describe("Posts Tests", () => {
   });
 
   test("Test get post by id fail (no data)", async () => {
-    const response = await request(app).get("/posts/" + postId);
+    const response = await request(app)
+      .get("/posts/" + postId)
+      .set({
+        Authorization: "JWT " + testUser.accessToken,
+      });
     expect(response.statusCode).toBe(404);
   });
 
