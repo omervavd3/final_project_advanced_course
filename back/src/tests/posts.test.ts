@@ -287,6 +287,29 @@ describe("Posts Tests", () => {
     expect(response.statusCode).not.toBe(200);
   });
 
+  test("Test delete with wrong password", async () => {
+    const response = await request(app)
+      .delete("/posts/" + postId)
+      .set({
+        Authorization: "JWT " + testUser.accessToken,
+      })
+      .send({
+        password: "wrong password",
+      });
+    expect(response.statusCode).toBe(402);
+  })
+
+  test("Test delete without password", async () => {
+    const response = await request(app)
+      .delete("/posts/" + postId)
+      .set({
+        Authorization: "JWT " + testUser.accessToken,
+      })
+      .send({
+      });
+    expect(response.statusCode).toBe(404);
+  })
+
   test("Test Delete Post", async () => {
     const response = await request(app)
       .delete("/posts/" + postId)
