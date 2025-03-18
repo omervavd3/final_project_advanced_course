@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import Post from "./Post";
 import Navbar from "./NavBar";
+import AiModal from "./AiModal";
 
 type Post = {
   title: string;
@@ -20,6 +21,7 @@ const HomePage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [profileImage, setProfileImage] = useState<string>("");
   const [userName, setUserName] = useState<string>("user");
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const limit = 6;
@@ -75,6 +77,10 @@ const HomePage = () => {
     console.log(currentPage);
     fetchPosts(currentPage);
   }, [currentPage]);
+
+  const toggleModal = () => {
+    setIsModalOpen((prev) => !prev);
+  };
 
   return (
     <div className="container mt-4">
@@ -134,6 +140,16 @@ const HomePage = () => {
           </a>
         )}
       </div>
+      {/* Button to Open the Modal */}
+      <button
+        className="btn btn-info position-fixed bottom-0 right-0 m-3"
+        onClick={toggleModal}
+      >
+        Chat with Gemini
+      </button>
+
+      {/* Modal Component */}
+      <AiModal isOpen={isModalOpen} onClose={toggleModal} />
     </div>
   );
 };
