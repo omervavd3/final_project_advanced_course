@@ -3,8 +3,8 @@ import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useState } from "react";
-import AuthAccess from "./AuthAccess";
+import { useEffect, useState } from "react";
+import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 
 const schema = z.object({
   email: z.string().email("Invalid email"),
@@ -14,6 +14,43 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 const Login = () => {
+  const checkAuth = async () => {
+    if (
+      document.cookie.includes("accessToken") &&
+      document.cookie.includes("refreshToken")
+    ) {
+      navigate("/home");
+    } else if (document.cookie.includes("refreshToken")) {
+      await axios
+        .post(
+          "http://localhost:3000/auth/refresh",
+          {},
+          {
+            withCredentials: true,
+            headers: {
+              Authorization: `Bearer ${
+                document.cookie.split("refreshToken=")[1].split(";")[0]
+              }`,
+            },
+          }
+        )
+        .then((response) => {
+          if (response.status === 200) {
+            navigate("/home");
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          navigate("/");
+        });
+    } else {
+      navigate("/");
+    }
+  };
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -46,9 +83,29 @@ const Login = () => {
       });
   };
 
+  const googleSuccessResponse = (credentialResponse: CredentialResponse) => {
+    console.log(credentialResponse)
+    axios
+      .post("http://localhost:3000/auth/google", credentialResponse, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        if (response.status == 200) {
+          navigate("/home");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        alert("Google login failed.");
+      });
+  };
+
+  const googleErrorResponse = () => {
+    console.log("Google login failed.");
+  };
+
   return (
     <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
-      <AuthAccess where_to_navigate="/"/>
       <div className="card p-4 shadow" style={{ width: "350px" }}>
         <h2 className="text-center mb-4">Login</h2>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -98,6 +155,10 @@ const Login = () => {
             Login
           </button>
         </form>
+        <GoogleLogin
+          onSuccess={googleSuccessResponse}
+          onError={googleErrorResponse}
+        />
         <div className="text-center mt-3">
           <a
             onClick={() => navigate("/signup")}

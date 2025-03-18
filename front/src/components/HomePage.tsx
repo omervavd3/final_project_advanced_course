@@ -1,9 +1,8 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Post from "./Post";
-import AuthAccess from "./AuthAccess";
 import Navbar from "./NavBar";
-import { useNavigate } from "react-router";
+import AiModal from "./AiModal";
 
 type Post = {
   title: string;
@@ -19,17 +18,17 @@ type Post = {
 };
 
 const HomePage = () => {
-  const navigate = useNavigate();
   const [posts, setPosts] = useState<Post[]>([]);
   const [profileImage, setProfileImage] = useState<string>("");
   const [userName, setUserName] = useState<string>("user");
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const limit = 6; 
+  const limit = 6;
 
   useEffect(() => {
     if (!document.cookie.includes("accessToken")) {
-      navigate("/");
+      window.location.href = "/";
     } else {
       fetchPosts(currentPage);
 
@@ -48,7 +47,11 @@ const HomePage = () => {
         })
         .catch((error) => {
           console.error(error);
-          setProfileImage("");
+          document.cookie =
+              "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie =
+              "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            window.location.href = "/";
         });
     }
   }, []);
@@ -75,14 +78,16 @@ const HomePage = () => {
   };
 
   useEffect(() => {
-    console.log(currentPage)
+    console.log(currentPage);
     fetchPosts(currentPage);
   }, [currentPage]);
 
+  const toggleModal = () => {
+    setIsModalOpen((prev) => !prev);
+  };
+
   return (
     <div className="container mt-4">
-      <AuthAccess where_to_navigate="/" />
-
       {/* Navbar */}
       <Navbar userName={userName} profileImageUrl={profileImage} />
 
@@ -111,31 +116,44 @@ const HomePage = () => {
       </div>
 
       {/* Pagination Controls */}
-      <div className="d-flex justify-content-center mt-3" style={{margin:"5px 0"}}>
-        {currentPage > 1 && currentPage <= totalPages &&(
+      <div
+        className="d-flex justify-content-center mt-3"
+        style={{ margin: "5px 0" }}
+      >
+        {currentPage > 1 && currentPage <= totalPages && (
           <a href="#top" className="">
             <button
-          className="btn btn-primary me-2"
-          disabled={currentPage === 1}
-          onClick={() => setCurrentPage((prev) => prev - 1)}
-        >
-          Load Previous
-        </button>
+              className="btn btn-primary me-2"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((prev) => prev - 1)}
+            >
+              Load Previous
+            </button>
           </a>
         )}
 
         {currentPage < totalPages && (
           <a href="#top" className="">
             <button
-          className="btn btn-primary"
-          disabled={currentPage >= totalPages}
-          onClick={() => setCurrentPage((prev) => prev + 1)}
-        >
-          Load More
-        </button>
+              className="btn btn-primary"
+              disabled={currentPage >= totalPages}
+              onClick={() => setCurrentPage((prev) => prev + 1)}
+            >
+              Load More
+            </button>
           </a>
         )}
       </div>
+      {/* Button to Open the Modal */}
+      <button
+        className="btn btn-info position-fixed bottom-0 right-0 m-3"
+        onClick={toggleModal}
+      >
+        Chat with Gemini
+      </button>
+
+      {/* Modal Component */}
+      <AiModal isOpen={isModalOpen} onClose={toggleModal} />
     </div>
   );
 };

@@ -28,11 +28,13 @@ import commentRouter from "./routes/commentRoutes";
 import multerRouter from "./routes/multerRoutes";
 import path from "path";
 import likesRouter from "./routes/likesRoutes";
+import aiRouter from "./routes/aiRoutes";
 app.use("/posts", postRouter);
 app.use("/auth", authRouter);
 app.use("/comments", commentRouter);
 app.use("/file", multerRouter);
 app.use("/likes", likesRouter);
+app.use("/ai", aiRouter);
 
 //swagger
 if (process.env.NODE_ENV == "development") {

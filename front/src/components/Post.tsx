@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import heart_black from "../assets/heart_black.png";
 import heart_red from "../assets/heart_red.png";
-import { useNavigate } from "react-router";
+// import { useNavigate } from "react-router";
 import trash from "../assets/trash.png";
 
 type PostProps = {
@@ -39,7 +39,7 @@ const Post: FC<PostProps> = ({
     comment: z.string().nonempty("Comment is required"),
   });
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const [liked, setLiked] = useState(false);
   const [heart, setHeart] = useState(heart_black);
@@ -199,7 +199,8 @@ const Post: FC<PostProps> = ({
   };
 
   const handleEditPost = (_id: string) => {
-    navigate(`/editPost/${_id}`);
+    // navigate(`/editPost/${_id}`);
+    window.location.href = `/editPost/${_id}`;
   };
 
   return (

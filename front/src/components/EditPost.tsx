@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router";
+// import { useNavigate } from "react-router";
 import { z } from "zod";
 import avatar from "../assets/icons8-avatar-96.png";
 
@@ -24,11 +24,10 @@ const EditPost = () => {
   const [postPhotoUrl, setPostPhotoUrl] = useState<string>("");
 
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
-  const [password, setPassword] = useState<string>("");
 
   const id = window.location.pathname.split("/")[2];
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -117,7 +116,6 @@ const EditPost = () => {
   const deletePost = async () => {
     await axios
       .delete(`http://localhost:3000/posts/${id}`, {
-        data: { password },
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${document.cookie.split("accessToken=")[1].split(";")[0]}`,
@@ -126,7 +124,7 @@ const EditPost = () => {
       .then((response) => {
         console.log(response);
         alert("Post deleted successfully");
-        navigate("/");
+        window.location.href = "/";
       })
       .catch((error) => {
         console.error(error);
@@ -148,7 +146,7 @@ const EditPost = () => {
 
         {/* Back & Delete Buttons */}
         <div className="d-flex justify-content-between mb-3">
-          <button onClick={() => navigate("/")} className="btn btn-outline-primary">
+          <button onClick={() => window.location.href = "/"} className="btn btn-outline-primary">
             <i className="bi bi-arrow-left"></i> Back to Home
           </button>
           <button
@@ -227,16 +225,6 @@ const EditPost = () => {
                 onClick={() => setShowDeleteModal(false)}
                 aria-label="Close"
               ></button>
-            </div>
-            <div className="modal-body">
-              <label htmlFor="password" className="form-label">Enter Password to Delete</label>
-              <input
-                type="password"
-                id="password"
-                className="form-control"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
             </div>
             <div className="modal-footer">
               <button

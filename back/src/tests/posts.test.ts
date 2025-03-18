@@ -3,8 +3,7 @@ import initApp from "../server";
 import mongoose from "mongoose";
 import PostModel from "../models/postModel";
 import UserModel from "../models/userModel";
-import e, { Express } from "express";
-import * as testJSON from "./testPost.json";
+import { Express } from "express";
 
 var app: Express;
 
@@ -248,15 +247,6 @@ describe("Posts Tests", () => {
     expect(response.statusCode).toBe(200);
   });
 
-  // test("Test get all pagination fail", async () => {
-  //   const response = await request(app)
-  //     .get("/posts/getAllPagination/-1/10")
-  //     .set({
-  //       Authorization: "JWT " + testUser.accessToken,
-  //     });
-  //   expect(response.statusCode).toBe(400);
-  // });
-
   test("Test get post by owner", async () => {
     const response = await request(app).get(`/posts?owner=${testUser._id}`);
     expect(response.statusCode).toBe(200);
@@ -280,6 +270,15 @@ describe("Posts Tests", () => {
     expect(response.body.owner).toBe(testUser._id);
   });
 
+  test("Test get all by user id", async () => {
+    const response = await request(app)
+      .post("/posts/getByUserId")
+      .set({
+        Authorization: "JWT " + testUser.accessToken,
+      });
+    expect(response.statusCode).toBe(200);
+  })
+
   test("Test get post by id fail (no matchind id)", async () => {
     const response = await request(app).get(
       "/posts/" + "679b79213d4c2e12fcb96aa9"
@@ -287,28 +286,15 @@ describe("Posts Tests", () => {
     expect(response.statusCode).not.toBe(200);
   });
 
-  test("Test delete with wrong password", async () => {
+  test("Test Delete Post Whitout Authorization", async () => {
     const response = await request(app)
       .delete("/posts/" + postId)
       .set({
-        Authorization: "JWT " + testUser.accessToken,
+        Authorization: "JWT " + testUser2.accessToken,
       })
-      .send({
-        password: "wrong password",
-      });
-    expect(response.statusCode).toBe(402);
-  })
+    expect(response.statusCode).not.toBe(204);
+  });
 
-  test("Test delete without password", async () => {
-    const response = await request(app)
-      .delete("/posts/" + postId)
-      .set({
-        Authorization: "JWT " + testUser.accessToken,
-      })
-      .send({
-      });
-    expect(response.statusCode).toBe(404);
-  })
 
   test("Test Delete Post", async () => {
     const response = await request(app)
@@ -316,9 +302,6 @@ describe("Posts Tests", () => {
       .set({
         Authorization: "JWT " + testUser.accessToken,
       })
-      .send({
-        password: testUser.password,
-      });
     expect(response.statusCode).toBe(204);
 
     const response2 = await request(app)

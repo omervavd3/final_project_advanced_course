@@ -1,5 +1,5 @@
 import { FC, useState } from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import AddPost from "./AddPost"; // Import your AddPost component
 import Logout from "./Logout";
 
@@ -10,7 +10,7 @@ type NavbarProps = {
 
 const Navbar: FC<NavbarProps> = ({ userName, profileImageUrl }) => {
   const [showModal, setShowModal] = useState(false);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   return (
     <>
@@ -63,7 +63,7 @@ const Navbar: FC<NavbarProps> = ({ userName, profileImageUrl }) => {
               <li className="nav-item ms-3">
                 <button
                   className="btn btn-outline-secondary rounded-pill px-3"
-                  onClick={() => navigate("/editUser")}
+                  onClick={() => window.location.href = "/editUser"}
                   style={{minWidth: "125px", margin:"5px 0"}}
                 >
                   ✏️ Edit User

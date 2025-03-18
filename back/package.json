@@ -11,17 +11,20 @@
     "commentsTest": "jest --detectOpenHandles --coverage --forceExit --testPathPattern=comments",
     "likesTest": "jest --detectOpenHandles --coverage --forceExit --testPathPattern=likes",
     "multerTest": "jest --detectOpenHandles --coverage --forceExit --testPathPattern=multer",
+    "middlewareTest": "jest --detectOpenHandles --coverage --forceExit --testPathPattern=middlewares",
     "test": "jest --detectOpenHandles --coverage --forceExit"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google/generative-ai": "^0.24.0",
     "body-parser": "^1.20.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "google-auth-library": "^9.15.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.8.4",
     "multer": "^1.4.5-lts.1"

@@ -5,7 +5,6 @@ import PostModel from "../models/postModel";
 import UserModel from "../models/userModel";
 import CommentModel from "../models/commentsModel";
 import { Express } from "express";
-import { profile } from "console";
 
 var app: Express;
 
@@ -246,15 +245,6 @@ describe("Comments Tests", () => {
     expect(response2.statusCode).toBe(200);
     expect(response2.body.length).toBe(0);
   });
-
-  // test("Comments get by user id", async () => {
-  //   const response = await request(app)
-  //     .get(`/comments/getByUserId`)
-  //     .set({
-  //       Authorization: `JWT ${testUser.accessToken}`,
-  //     });
-  //   expect(response.statusCode).toBe(200);
-  // });
 
   test("Comments get by post id", async () => {
     const response = await request(app)

@@ -34,16 +34,31 @@ describe("File Tests", () => {
     }
   });
 
+  test("upload file fail", async () => {
+    const filePath = `${__dirname}/icons8-avatar-96.png`;
+    const response = await request(app)
+      .post("/file?file=123.jpeg")
+    expect(response.statusCode).not.toEqual(200);
+  });
+
   test("delete file", async () => {
-      const fileName = uploadedFileUrl.split("/").pop();
-      console.log("File name to delete: ", fileName);
+    const fileName = uploadedFileUrl.split("/").pop();
+    console.log("File name to delete: ", fileName);
 
-      const response = await request(app).delete(`/file/${fileName}`);
-      expect(response.statusCode).toEqual(200); 
+    const response = await request(app).delete(`/file/${fileName}`);
+    expect(response.statusCode).toEqual(200);
 
-      await new Promise((resolve) => setTimeout(resolve, 500)); 
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
-      const res = await request(app).get(`/file/${fileName}`);
-      expect(res.statusCode).toEqual(404); 
+    const res = await request(app).get(`/file/${fileName}`);
+    expect(res.statusCode).toEqual(404);
+  });
+
+  test("delete file fail", async () => {
+    const fileName = uploadedFileUrl.split("/").pop();
+    console.log("File name to delete: ", fileName);
+
+    const response = await request(app).delete(`/file/${fileName}`);
+    expect(response.statusCode).not.toEqual(200);
   });
 });

@@ -136,24 +136,18 @@ export const postDeleteMiddleware = async (
 ): Promise<void> => {
   try {
     const postId = req.params.id;
-    const password = req.body.password;
-    if (!password) {
-      res.status(404).send("Password is required");
-      return;
-    }
     const user = await UserModel.findById(req.params.userId);
     if (!user) {
       res.status(404).send("User not found");
       return;
     }
-    const valid = await bcrypt.compare(password, user.password);
-    if (!valid) {
-      res.status(402).send("Invalid password");
-      return;
-    }
     const post = await PostModel.findById(postId);
     if (!post) {
       res.status(404).send("Post not found");
+      return;
+    }
+    if(post.owner !== user.id) {
+      res.status(403).send("Unauthorized");
       return;
     }
     const photo = post.photo;
@@ -282,27 +276,47 @@ export const authDeleteMiddleware = async (
       res.status(404).send("User not found");
       return;
     }
-    const valid = await bcrypt.compare(password, user.password);
-    if (!valid) {
-      res.status(402).send("Invalid password");
-      return;
-    }
-    const profileImageUrlForDelete = user.profileImageUrl;
-    if (profileImageUrlForDelete) {
-      const fileName = profileImageUrlForDelete.split("/").pop() || "";
-      const imageDelete = await deleteImageMiddleware(fileName);
-      if (!imageDelete) {
-        res.status(500).send("Error deleting image");
+    console.log(user.password);
+    if (user.password != "google-signin") {
+      const valid = await bcrypt.compare(password, user.password);
+      if (!valid) {
+        res.status(402).send("Invalid password");
         return;
+      }
+      const profileImageUrlForDelete = user.profileImageUrl;
+      if (profileImageUrlForDelete) {
+        const fileName = profileImageUrlForDelete.split("/").pop() || "";
+        const imageDelete = await deleteImageMiddleware(fileName);
+        if (!imageDelete) {
+          res.status(500).send("Error deleting image");
+          return;
+        }
       }
     }
     const comments = await CommentModel.find({ owner: userId });
     if (comments.length > 0) {
       await CommentModel.deleteMany({ owner: userId });
     }
+    const likes = await LikesModel.find({ owner: userId });
+    if (likes.length > 0) {
+      likes.forEach(async (like) => {
+        const post = await PostModel.find({ _id: like.postId });
+        post[0].likes -= 1;
+        await post[0].save();
+      });
+      await LikesModel.deleteMany({ owner: userId });
+    }
     const posts = await PostModel.find({ owner: userId });
     if (posts.length > 0) {
       posts.forEach(async (post) => {
+        const likesForPost = await LikesModel.find({ postId: post._id });
+        if (likesForPost.length > 0) {
+          await LikesModel.deleteMany({ postId: post._id });
+        }
+        const commentsForPost = await CommentModel.find({ postId: post._id });
+        if (commentsForPost.length > 0) {
+          await CommentModel.deleteMany({ postId: post._id });
+        }
         const photo = post.photo;
         if (photo) {
           const fileName = photo.split("/").pop() || "";
@@ -314,15 +328,6 @@ export const authDeleteMiddleware = async (
         }
       });
       await PostModel.deleteMany({ owner: userId });
-    }
-    const likes = await LikesModel.find({ owner: userId });
-    if (likes.length > 0) {
-      likes.forEach(async (like) => {
-        const post = await PostModel.find({ _id: like.postId });
-        post[0].likes -= 1;
-        await post[0].save();
-      });
-      await LikesModel.deleteMany({ owner: userId });
     }
     next();
   } catch (error) {
