@@ -85,6 +85,13 @@ describe("User Tests", () => {
     expect(response.statusCode).toBe(404);
   });
 
+  test("Auth test google login fail", async () => {
+    const response = await request(app).post("/auth/google").send({
+      credential: "adsad"
+    });
+    expect(response.statusCode).not.toBe(200);
+  })
+
   test("Auth test login", async () => {
     const response = await request(app).post("/auth/login").send({
       email: testUser.email,

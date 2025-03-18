@@ -11,6 +11,7 @@
     "commentsTest": "jest --detectOpenHandles --coverage --forceExit --testPathPattern=comments",
     "likesTest": "jest --detectOpenHandles --coverage --forceExit --testPathPattern=likes",
     "multerTest": "jest --detectOpenHandles --coverage --forceExit --testPathPattern=multer",
+    "middlewareTest": "jest --detectOpenHandles --coverage --forceExit --testPathPattern=middlewares",
     "test": "jest --detectOpenHandles --coverage --forceExit"
   },
   "keywords": [],

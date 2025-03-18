@@ -7,16 +7,6 @@ class CommentController extends BaseController<CommentController> {
         super(CommentModel);
     }
 
-    // async getByUserId(req:Request, res:Response) {
-    //     try {
-    //         const userId = req.params.userId;
-    //         const data = await CommentModel.find({ owner: userId });
-    //         res.status(200).send(data);
-    //     } catch (error) {
-    //         res.status(500).send(error);
-    //     }
-    // }
-
     async getByPostId(req: Request, res: Response) {
         try {
             const postId = req.params.postId;
