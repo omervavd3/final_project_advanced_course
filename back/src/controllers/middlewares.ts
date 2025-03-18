@@ -103,6 +103,7 @@ export const postMiddleware = async (
     const userId = req.params.userId;
     const postId = req.params.id;
     const photo = req.body.photo;
+    console.log("post update photo "+photo)
     const post = await PostModel.findById(postId);
     if (!post) {
       res.status(404).send("Post not found");
@@ -112,7 +113,8 @@ export const postMiddleware = async (
       res.status(403).send("Unauthorized");
       return;
     }
-    if (photo) {
+    console.log(photo == post.photo)
+    if (photo && photo != post.photo) {
       const photoForDelte = post.photo;
       if (photoForDelte) {
         const fileName = photoForDelte.split("/").pop() || "";

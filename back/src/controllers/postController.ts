@@ -56,7 +56,9 @@ class PostController extends BaseController<typeof PostModel> {
       }
       updatedItem.title = title;
       updatedItem.content = content;
-      updatedItem.photo = photo;
+      if (photo) {
+        updatedItem.photo = photo;
+      }
       await updatedItem.save();
       res.status(200).send(updatedItem);
     } catch (error) {
