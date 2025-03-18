@@ -1,9 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Post from "./Post";
-import AuthAccess from "./AuthAccess";
 import Navbar from "./NavBar";
-import { useNavigate } from "react-router";
 
 type Post = {
   title: string;
@@ -19,17 +17,16 @@ type Post = {
 };
 
 const HomePage = () => {
-  const navigate = useNavigate();
   const [posts, setPosts] = useState<Post[]>([]);
   const [profileImage, setProfileImage] = useState<string>("");
   const [userName, setUserName] = useState<string>("user");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const limit = 6; 
+  const limit = 6;
 
   useEffect(() => {
     if (!document.cookie.includes("accessToken")) {
-      navigate("/");
+      window.location.href = "/";
     } else {
       fetchPosts(currentPage);
 
@@ -75,14 +72,12 @@ const HomePage = () => {
   };
 
   useEffect(() => {
-    console.log(currentPage)
+    console.log(currentPage);
     fetchPosts(currentPage);
   }, [currentPage]);
 
   return (
     <div className="container mt-4">
-      <AuthAccess where_to_navigate="/" />
-
       {/* Navbar */}
       <Navbar userName={userName} profileImageUrl={profileImage} />
 
@@ -111,28 +106,31 @@ const HomePage = () => {
       </div>
 
       {/* Pagination Controls */}
-      <div className="d-flex justify-content-center mt-3" style={{margin:"5px 0"}}>
-        {currentPage > 1 && currentPage <= totalPages &&(
+      <div
+        className="d-flex justify-content-center mt-3"
+        style={{ margin: "5px 0" }}
+      >
+        {currentPage > 1 && currentPage <= totalPages && (
           <a href="#top" className="">
             <button
-          className="btn btn-primary me-2"
-          disabled={currentPage === 1}
-          onClick={() => setCurrentPage((prev) => prev - 1)}
-        >
-          Load Previous
-        </button>
+              className="btn btn-primary me-2"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((prev) => prev - 1)}
+            >
+              Load Previous
+            </button>
           </a>
         )}
 
         {currentPage < totalPages && (
           <a href="#top" className="">
             <button
-          className="btn btn-primary"
-          disabled={currentPage >= totalPages}
-          onClick={() => setCurrentPage((prev) => prev + 1)}
-        >
-          Load More
-        </button>
+              className="btn btn-primary"
+              disabled={currentPage >= totalPages}
+              onClick={() => setCurrentPage((prev) => prev + 1)}
+            >
+              Load More
+            </button>
           </a>
         )}
       </div>

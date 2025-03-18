@@ -84,7 +84,19 @@ const Login = () => {
   };
 
   const googleSuccessResponse = (credentialResponse: CredentialResponse) => {
-    console.log(credentialResponse);
+    axios
+      .post("http://localhost:3000/auth/google", credentialResponse, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        if (response.status == 200) {
+          navigate("/home");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        alert("Google login failed.");
+      });
   };
 
   const googleErrorResponse = () => {

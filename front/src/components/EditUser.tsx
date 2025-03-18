@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import avatar from "../assets/icons8-avatar-96.png";
-import { useNavigate } from "react-router";
+// import { useNavigate } from "react-router";
 import Post from "./Post";
 
 type Post = {
@@ -34,7 +34,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 const EditUser = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -53,6 +53,7 @@ const EditUser = () => {
   const [userPosts, setUserPosts] = useState<Post[]>([]);
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [passwordForDelete, setPasswordForDelete] = useState<string>("");
+  const [isUserGoogle, setIsUserGoogle] = useState<boolean>(false);
 
   const togglePreviousPasswordVisibility = () => {
     setShowPreviousPassword((prev) => !prev);
@@ -60,7 +61,7 @@ const EditUser = () => {
 
   useEffect(() => {
     if (!document.cookie.includes("accessToken")) {
-      navigate("/");
+      window.location.href = "/";
     }
     const loadPageInfo = async () => {
       await axios
@@ -78,6 +79,10 @@ const EditUser = () => {
           setUserName(response.data.userName);
           setUpdateName(response.data.userName);
           setUpdateEmail(response.data.email);
+          setIsUserGoogle(response.data.isGoogleSignIn);
+          if(response.data.isGoogleSignIn) {
+            setPasswordForDelete("google-signin");
+          }
         })
         .catch((error) => {
           console.error(error);
@@ -188,7 +193,7 @@ const EditUser = () => {
         console.log(response);
         if (response.status === 200) {
           alert("User deleted successfully");
-          navigate("/");
+          window.location.href = "/";
         }
       })
       .catch((error) => {
@@ -201,7 +206,7 @@ const EditUser = () => {
     <div className="container mt-4">
       <div className="text-center mb-4">
         <h1 className="fw-bold">@{userName}</h1>
-        <button className="btn btn-secondary" onClick={() => navigate("/")}>
+        <button className="btn btn-secondary" onClick={() => window.location.href = "/"}>
           Back to home page
         </button>
         <button
@@ -223,7 +228,8 @@ const EditUser = () => {
         </div>
       )}
 
-      <div className="accordion" id="editProfileAccordion">
+      {!isUserGoogle && (
+        <div className="accordion" id="editProfileAccordion">
         <div className="accordion-item">
           <h2 className="accordion-header">
             <button
@@ -341,6 +347,7 @@ const EditUser = () => {
           </div>
         </div>
       </div>
+      )}
 
       <div className="row justify-content-center">
         {userPosts && userPosts.length > 0 ? (
@@ -391,7 +398,8 @@ const EditUser = () => {
                 aria-label="Close"
               ></button>
             </div>
-            <div className="modal-body">
+            {!isUserGoogle && (
+              <div className="modal-body">
               <label htmlFor="password" className="form-label">
                 Enter Password to Delete
               </label>
@@ -403,6 +411,7 @@ const EditUser = () => {
                 onChange={(e) => setPasswordForDelete(e.target.value)}
               />
             </div>
+            )}
             <div className="modal-footer">
               <button
                 type="button"

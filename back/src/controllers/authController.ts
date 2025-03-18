@@ -2,6 +2,8 @@ import UserModel from "../models/userModel";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { OAuth2Client } from "google-auth-library";
+const client = new OAuth2Client();
 
 const register = async (req: Request, res: Response) => {
   try {
@@ -100,6 +102,81 @@ const login = async (req: Request, res: Response) => {
     res
       .status(200)
       .send({ accessToken: accessToken, refreshToken: refreshToken });
+  } catch (error) {
+    res.status(500).send(error);
+  }
+};
+
+const googleSignIn = async (req: Request, res: Response) => {
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: req.body.credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    const email = payload?.email;
+    if (email) {
+      let user = await UserModel.findOne({ email: email });
+      if (user == null) {
+        user = await UserModel.create({
+          email: email,
+          password: "google-signin",
+          userName: payload?.name,
+          profileImageUrl: payload?.picture,
+        });
+      }
+
+      if (
+        process.env.ACCESS_TOKEN_SECRET == null ||
+        process.env.JWT_ACCESS_EXPIRES_IN == null ||
+        process.env.REFRESH_TOKEN_SECRET == null
+      ) {
+        res.status(500).send("Internal server error");
+        return;
+      }
+      if (process.env.REFRESH_TOKEN_SECRET == null) {
+        res.status(500).send("Internal server error");
+        return;
+      }
+      const random = Math.random().toString();
+      const accessToken = await jwt.sign(
+        {
+          _id: user._id,
+          userName: user.userName,
+          random: random,
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: process.env.JWT_ACCESS_EXPIRES_IN }
+      );
+      const refreshToken = await jwt.sign(
+        {
+          _id: user._id,
+          userName: user.userName,
+          random: random,
+        },
+        process.env.REFRESH_TOKEN_SECRET,
+        { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN }
+      );
+      if (user.tokens == null) {
+        user.tokens = [];
+      }
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: false,
+        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      });
+
+      res.cookie("accessToken", accessToken, {
+        httpOnly: false,
+        expires: new Date(Date.now() + 60 * 60 * 1000),
+      });
+      user.tokens.push(refreshToken);
+      await user.save();
+      res
+        .status(200)
+        .send({ accessToken: accessToken, refreshToken: refreshToken });
+    } else {
+      res.status(400).send("No email found in google account");
+    }
   } catch (error) {
     res.status(500).send(error);
   }
@@ -320,13 +397,16 @@ const getUserInfo = async (req: Request, res: Response) => {
       res.status(404).send("User not found");
       return;
     }
-    res
-      .status(200)
-      .send({
-        userName: user.userName,
-        email: user.email,
-        profileImageUrl: user.profileImageUrl,
-      });
+    let isGoogleSignIn = false;
+    if (user.password === "google-signin") {
+      isGoogleSignIn = true;
+    }
+    res.status(200).send({
+      userName: user.userName,
+      email: user.email,
+      profileImageUrl: user.profileImageUrl,
+      isGoogleSignIn: isGoogleSignIn,
+    });
   } catch (error) {
     res.status(500).send(error);
   }
@@ -359,4 +439,5 @@ export default {
   getProfileImageUrlAndName,
   deleteUser,
   getUserInfo,
+  googleSignIn,
 };
