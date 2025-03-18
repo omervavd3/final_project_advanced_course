@@ -3,8 +3,7 @@ import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useState } from "react";
-import AuthAccess from "./AuthAccess";
+import { useEffect, useState } from "react";
 import avatar from "../assets/icons8-avatar-96.png";
 
 // Define apiClient using axios
@@ -25,6 +24,43 @@ type FormData = z.infer<typeof schema>;
 
 const Signup = () => {
   const navigate = useNavigate();
+  const checkAuth = async () => {
+    if (
+      document.cookie.includes("accessToken") &&
+      document.cookie.includes("refreshToken")
+    ) {
+      navigate("/home");
+    } else if (document.cookie.includes("refreshToken")) {
+      await axios
+        .post(
+          "http://localhost:3000/auth/refresh",
+          {},
+          {
+            withCredentials: true,
+            headers: {
+              Authorization: `Bearer ${
+                document.cookie.split("refreshToken=")[1].split(";")[0]
+              }`,
+            },
+          }
+        )
+        .then((response) => {
+          if (response.status === 200) {
+            navigate("/home");
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          navigate("/signup");
+        });
+    } else {
+      navigate("/signup");
+    }
+  };
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
   const [showPassword, setShowPassword] = useState(false);
   const [image, setImage] = useState<File | null>(null);
 
@@ -103,7 +139,6 @@ const Signup = () => {
 
   return (
     <div className="d-flex justify-content-center align-items-center bg-light">
-      <AuthAccess where_to_navigate="/signup" />
       <div
         className="card p-4 shadow-lg"
         style={{
