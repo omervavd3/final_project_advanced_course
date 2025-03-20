@@ -8,7 +8,7 @@ import avatar from "../assets/icons8-avatar-96.png";
 import Loader from "./Loader";
 
 const apiClient = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: "https://node38.cs.colman.ac.il",
 });
 
 const schema = z.object({
@@ -39,7 +39,7 @@ const EditPost = () => {
   useEffect(() => {
     setLoading(true);
     axios
-      .get(`http://localhost:3000/posts/${id}`, {
+      .get(`https://node38.cs.colman.ac.il/posts/${id}`, {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${
@@ -96,7 +96,7 @@ const EditPost = () => {
       console.log(postPhotoUrl);
       await axios
         .put(
-          `http://localhost:3000/posts/${id}`,
+          `https://node38.cs.colman.ac.il/posts/${id}`,
           {
             title: data.title ? data.title : title,
             content: data.content ? data.content : content,
@@ -125,7 +125,7 @@ const EditPost = () => {
   const deletePost = async () => {
     setLoading(true);
     await axios
-      .delete(`http://localhost:3000/posts/${id}`, {
+      .delete(`https://node38.cs.colman.ac.il/posts/${id}`, {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${

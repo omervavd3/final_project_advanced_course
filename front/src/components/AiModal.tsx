@@ -33,7 +33,7 @@ const AiModal: FC<ModalProps> = ({ isOpen, onClose }) => {
     console.log(data.prompt);
     await axios
       .post(
-        "http://localhost:3000/ai",
+        "https://node38.cs.colman.ac.il/ai",
         { prompt: data.prompt },
         {
           withCredentials: true,

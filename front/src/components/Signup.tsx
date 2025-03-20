@@ -9,7 +9,7 @@ import Loader from "./Loader";
 
 // Define apiClient using axios
 const apiClient = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: "https://node38.cs.colman.ac.il",
 });
 
 const schema = z.object({
@@ -34,7 +34,7 @@ const Signup = () => {
     } else if (document.cookie.includes("refreshToken")) {
       await axios
         .post(
-          "http://localhost:3000/auth/refresh",
+          "https://node38.cs.colman.ac.il/auth/refresh",
           {},
           {
             withCredentials: true,
@@ -119,7 +119,7 @@ const Signup = () => {
             profileImageUrl: url,
           };
           axios
-            .post("http://localhost:3000/auth/register", newUserData)
+            .post("https://node38.cs.colman.ac.il/auth/register", newUserData)
             .then((response) => {
               console.log(response);
               if (response.status === 201) {

@@ -17,7 +17,7 @@ const AuthAccess: FC<AuthAccessProps> = ({ where_to_navigate }) => {
     } else if (document.cookie.includes("refreshToken")) {
       await axios
         .post(
-          "http://localhost:3000/auth/refresh",
+          "https://node38.cs.colman.ac.il/auth/refresh",
           {},
           {
             withCredentials: true,

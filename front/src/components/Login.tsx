@@ -26,7 +26,7 @@ const Login = () => {
       setLoading(true);
       await axios
         .post(
-          "http://localhost:3000/auth/refresh",
+          "https://node38.cs.colman.ac.il/auth/refresh",
           {},
           {
             withCredentials: true,
@@ -74,7 +74,7 @@ const Login = () => {
     reset();
     console.log(data);
     axios
-      .post("http://localhost:3000/auth/login", data, {
+      .post("https://node38.cs.colman.ac.il/auth/login", data, {
         withCredentials: true,
       })
       .then((response) => {
@@ -95,7 +95,7 @@ const Login = () => {
     setLoading(true);
     console.log(credentialResponse);
     axios
-      .post("http://localhost:3000/auth/google", credentialResponse, {
+      .post("https://node38.cs.colman.ac.il/auth/google", credentialResponse, {
         withCredentials: true,
       })
       .then((response) => {

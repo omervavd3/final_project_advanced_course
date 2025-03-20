@@ -20,7 +20,7 @@ type Post = {
 };
 
 const apiClient = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: "https://node38.cs.colman.ac.il",
 });
 
 const schema = z.object({
@@ -68,7 +68,7 @@ const EditUser = () => {
     setLoading(true);
     const loadPageInfo = async () => {
       await axios
-        .get("http://localhost:3000/auth/getUserInfo", {
+        .get("https://node38.cs.colman.ac.il/auth/getUserInfo", {
           withCredentials: true,
           headers: {
             Authorization: `Bearer ${
@@ -94,7 +94,7 @@ const EditUser = () => {
 
       await axios
         .post(
-          "http://localhost:3000/posts/getByUserId",
+          "https://node38.cs.colman.ac.il/posts/getByUserId",
           {},
           {
             headers: {
@@ -156,7 +156,7 @@ const EditUser = () => {
     }
     await axios
       .put(
-        "http://localhost:3000/auth",
+        "https://node38.cs.colman.ac.il/auth",
         {
           email: data.email,
           userName: data.userName,
@@ -188,7 +188,7 @@ const EditUser = () => {
   const handleDeleteUser = async () => {
     setLoading(true);
     await axios
-      .delete("http://localhost:3000/auth/deleteUser", {
+      .delete("https://node38.cs.colman.ac.il/auth/deleteUser", {
         data: { password: passwordForDelete },
         headers: {
           Authorization: `Bearer ${

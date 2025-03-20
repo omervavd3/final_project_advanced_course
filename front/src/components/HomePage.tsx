@@ -36,7 +36,7 @@ const HomePage = () => {
       fetchPosts(currentPage);
 
       axios
-        .get("http://localhost:3000/auth/getProfileImageUrlAndName", {
+        .get("https://node38.cs.colman.ac.il/auth/getProfileImageUrlAndName", {
           withCredentials: true,
           headers: {
             Authorization: `Bearer ${
@@ -64,7 +64,7 @@ const HomePage = () => {
   const fetchPosts = (page: number) => {
     setLoading(true);
     axios
-      .get(`http://localhost:3000/posts/getAllPagination/${page}/${limit}`, {
+      .get(`https://node38.cs.colman.ac.il/posts/getAllPagination/${page}/${limit}`, {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${

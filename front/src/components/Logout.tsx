@@ -4,7 +4,7 @@ const Logout = () => {
   const logout = () => {
     axios
       .post(
-        "http://localhost:3000/auth/logout",
+        "https://node38.cs.colman.ac.il/auth/logout",
         {},
         {
           withCredentials: true,

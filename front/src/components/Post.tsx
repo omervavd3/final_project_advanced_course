@@ -60,7 +60,7 @@ const Post: FC<PostProps> = ({
   const fetchComments = async () => {
     setLoading(true);
     axios
-      .get(`http://localhost:3000/comments/getByPostId/${_id}/${page}/3`, {
+      .get(`https://node38.cs.colman.ac.il/comments/getByPostId/${_id}/${page}/3`, {
         headers: {
           Authorization: `Bearer ${
             document.cookie.split("accessToken=")[1].split(";")[0]
@@ -98,7 +98,7 @@ const Post: FC<PostProps> = ({
     setLiked(!liked);
     axios
       .post(
-        `http://localhost:3000/likes`,
+        `https://node38.cs.colman.ac.il/likes`,
         {
           postId: _id,
           value: value,
@@ -125,7 +125,7 @@ const Post: FC<PostProps> = ({
     setLoading(true);
     axios
       .post(
-        `http://localhost:3000/likes/getByUserAndPost`,
+        `https://node38.cs.colman.ac.il/likes/getByUserAndPost`,
         {
           postId: _id,
         },
@@ -169,7 +169,7 @@ const Post: FC<PostProps> = ({
     reset();
     axios
       .post(
-        "http://localhost:3000/comments",
+        "https://node38.cs.colman.ac.il/comments",
         {
           postId: _id,
           comment: data.comment,
@@ -197,7 +197,7 @@ const Post: FC<PostProps> = ({
   const handleDeleteComment = (commentId: string) => {
     setLoading(true);
     axios
-      .delete(`http://localhost:3000/comments/${commentId}`, {
+      .delete(`https://node38.cs.colman.ac.il/comments/${commentId}`, {
         headers: {
           Authorization: `Bearer ${
             document.cookie.split("accessToken=")[1].split(";")[0]

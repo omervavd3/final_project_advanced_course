@@ -19,6 +19,10 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'], 
 }));
 
+app.use((req,res) => {
+  res.header("Access-Control-Allow-Credentials", "true");
+})
+
 
 app.use(cookieParser());
 
@@ -55,6 +59,8 @@ if (process.env.NODE_ENV == "development" || process.env.NODE_ENV == "production
 }
 
 app.use(express.static(path.join(__dirname, "../public")));
+app.use(express.static(path.join(__dirname, "../front")));
+
 
 const initApp = () => {
   return new Promise<Express>((resolve, reject) => {

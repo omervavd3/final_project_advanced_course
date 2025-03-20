@@ -1,9 +1,9 @@
 //get all posts
-GET http://localhost:3000/posts
+GET https://node38.cs.colman.ac.il/posts
 
 ###
 
-POST http://localhost:3000/posts
+POST https://node38.cs.colman.ac.il/posts
 Authorization: JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Nzc0MWNkYWFiYjFhYjVmMTgzMGIxOTciLCJpYXQiOjE3MzU2NjMwNDIsImV4cCI6MTczNTY2NjY0Mn0.680KF603pqonag4GBQIWwYFWJOep1J7z-ai-AdkDHR0
 Content-Type: application/json
 
@@ -15,7 +15,7 @@ Content-Type: application/json
 
 ###
 
-POST http://localhost:3000/auth/login
+POST https://node38.cs.colman.ac.il/auth/login
 Content-Type: application/json
 
 {
@@ -25,7 +25,7 @@ Content-Type: application/json
 
 ###
 
-POST http://localhost:3000/auth/register
+POST https://node38.cs.colman.ac.il/auth/register
 Content-Type: application/json
 
 {
@@ -36,12 +36,12 @@ Content-Type: application/json
 ###
 
 
-POST http://localhost:3000/auth/logout
+POST https://node38.cs.colman.ac.il/auth/logout
 Authorization: JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Nzc0MjA3NzRmNzRiMThkNGE4ZGE2NWMiLCJyYW5kb20iOiIwLjA1OTQxNjg4MTgyODI2MDEwNCIsImlhdCI6MTczNTY2MzgyM30.Vhv7C8Fg-erCtLRsuzy0iZUPXjHVhwz2X6F0up1Qupc
 
 ###
 
-POST http://localhost:3000/auth/refresh
+POST https://node38.cs.colman.ac.il/auth/refresh
 Content-Type: application/json
 
 {

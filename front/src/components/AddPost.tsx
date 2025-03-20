@@ -12,7 +12,7 @@ type AddPostProps = {
 };
 
 const apiClient = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: "https://node38.cs.colman.ac.il",
 });
 
 const schema = z.object({
@@ -69,7 +69,7 @@ const AddPost: FC<AddPostProps> = ({ userName, profileImageUrl }) => {
             ownerPhoto: profileImageUrl,
           };
           axios
-            .post("http://localhost:3000/posts", newPostData, {
+            .post("https://node38.cs.colman.ac.il/posts", newPostData, {
               withCredentials: true,
               headers: {
                 Authorization: `Bearer ${
