@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(cors({
-  origin: 'http://localhost:5173', 
+  origin: '*', 
   credentials: true, 
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
   allowedHeaders: ['Content-Type', 'Authorization'], 
@@ -55,14 +55,14 @@ if (process.env.NODE_ENV == "development" || process.env.NODE_ENV == "production
   app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 }
 
-app.use(express.static(path.join(__dirname, "../public")));
-app.use(express.static(path.join(__dirname, "../front")));
+app.use(express.static( "./public"));
+app.use(express.static("./build"));
 
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../../front", "index.html"));
+  res.sendFile("../build");
 });
 
-// app.use(express.static(path.join(__dirname, "../../front"), {
+// app.use(express.static(path.join(__dirname, "../../build"), {
 //   setHeaders: (res, path) => {
 //     if (path.endsWith('.js')) {
 //       res.set('Content-Type', 'application/javascript');
