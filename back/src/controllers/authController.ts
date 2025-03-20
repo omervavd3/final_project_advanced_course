@@ -123,7 +123,8 @@ const googleSignIn = async (req: Request, res: Response) => {
       idToken: req.body.credential,
       audience: process.env.GOOGLE_CLIENT_ID,
     });
-    const payload = ticket.getPayload();
+    const payload = await ticket.getPayload();
+    console.log(payload);
     const email = payload?.email;
     if (email) {
       let user = await UserModel.findOne({ email: email });
@@ -132,8 +133,11 @@ const googleSignIn = async (req: Request, res: Response) => {
           email: email,
           password: "google-signin",
           userName: payload?.name,
-          profileImageUrl: payload?.picture,
         });
+      }
+      if (payload?.picture) {
+        user.profileImageUrl = payload?.picture;
+        await user.save();
       }
 
       const tokens = await loginHelper(user, res);

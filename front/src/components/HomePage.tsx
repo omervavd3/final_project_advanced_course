@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Post from "./Post";
 import Navbar from "./NavBar";
 import AiModal from "./AiModal";
+import Loader from "./Loader";
 
 type Post = {
   title: string;
@@ -25,11 +26,13 @@ const HomePage = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const limit = 6;
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!document.cookie.includes("accessToken")) {
       window.location.href = "/";
     } else {
+      setLoading(true);
       fetchPosts(currentPage);
 
       axios
@@ -42,21 +45,24 @@ const HomePage = () => {
           },
         })
         .then((response) => {
+          setLoading(false);
           setProfileImage(response.data.profileImageUrl);
           setUserName(response.data.userName);
         })
         .catch((error) => {
+          setLoading(false);
           console.error(error);
           document.cookie =
-              "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            document.cookie =
-              "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            window.location.href = "/";
+            "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+          document.cookie =
+            "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+          window.location.href = "/";
         });
     }
   }, []);
 
   const fetchPosts = (page: number) => {
+    setLoading(true);
     axios
       .get(`http://localhost:3000/posts/getAllPagination/${page}/${limit}`, {
         withCredentials: true,
@@ -67,11 +73,13 @@ const HomePage = () => {
         },
       })
       .then((response) => {
+        setLoading(false);
         setPosts(response.data.posts);
         setTotalPages(response.data.totalPages);
         console.log(response.data);
       })
       .catch((error) => {
+        setLoading(false);
         console.error(error);
         setPosts([]);
       });
@@ -93,25 +101,31 @@ const HomePage = () => {
 
       {/* Posts Section */}
       <div className="row justify-content-center">
-        {posts.length > 0 ? (
-          posts.map((post, index) => (
-            <div key={index} className="col-md-6 col-lg-4 mb-4">
-              <Post
-                title={post.title}
-                content={post.content}
-                photo={post.photo}
-                likes={post.likes}
-                _id={post._id}
-                userName={userName}
-                ownerPhoto={post.ownerPhoto}
-                ownerName={post.ownerName}
-              />
-            </div>
-          ))
+        {loading ? (
+          <Loader />
         ) : (
-          <div className="col-12 text-center">
-            <p className="text-muted">No posts available</p>
-          </div>
+          <>
+            {posts.length > 0 ? (
+              posts.map((post, index) => (
+                <div key={index} className="col-md-6 col-lg-4 mb-4">
+                  <Post
+                    title={post.title}
+                    content={post.content}
+                    photo={post.photo}
+                    likes={post.likes}
+                    _id={post._id}
+                    userName={userName}
+                    ownerPhoto={post.ownerPhoto}
+                    ownerName={post.ownerName}
+                  />
+                </div>
+              ))
+            ) : (
+              <div className="col-12 text-center">
+                <p className="text-muted">No posts available</p>
+              </div>
+            )}
+          </>
         )}
       </div>
 

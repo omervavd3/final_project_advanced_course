@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
+import Loader from "./Loader";
 
 const schema = z.object({
   email: z.string().email("Invalid email"),
@@ -14,6 +15,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 const Login = () => {
+  const [loading, setLoading] = useState(false);
   const checkAuth = async () => {
     if (
       document.cookie.includes("accessToken") &&
@@ -21,6 +23,7 @@ const Login = () => {
     ) {
       navigate("/home");
     } else if (document.cookie.includes("refreshToken")) {
+      setLoading(true);
       await axios
         .post(
           "http://localhost:3000/auth/refresh",
@@ -36,10 +39,12 @@ const Login = () => {
         )
         .then((response) => {
           if (response.status === 200) {
+            setLoading(false);
             navigate("/home");
           }
         })
         .catch((error) => {
+          setLoading(false);
           console.error(error);
           navigate("/");
         });
@@ -65,6 +70,7 @@ const Login = () => {
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   const onSubmit = (data: FormData) => {
+    setLoading(true);
     reset();
     console.log(data);
     axios
@@ -72,29 +78,34 @@ const Login = () => {
         withCredentials: true,
       })
       .then((response) => {
+        setLoading(false);
         console.log(response);
         if (response.status == 200) {
           navigate("/home");
         }
       })
       .catch((error) => {
+        setLoading(false);
         console.error(error);
         alert("Username or password is incorrect.");
       });
   };
 
   const googleSuccessResponse = (credentialResponse: CredentialResponse) => {
-    console.log(credentialResponse)
+    setLoading(true);
+    console.log(credentialResponse);
     axios
       .post("http://localhost:3000/auth/google", credentialResponse, {
         withCredentials: true,
       })
       .then((response) => {
+        setLoading(false);
         if (response.status == 200) {
           navigate("/home");
         }
       })
       .catch((error) => {
+        setLoading(false);
         console.error(error);
         alert("Google login failed.");
       });
@@ -106,68 +117,76 @@ const Login = () => {
 
   return (
     <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
-      <div className="card p-4 shadow" style={{ width: "350px" }}>
-        <h2 className="text-center mb-4">Login</h2>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="mb-3">
-            <label htmlFor="email" className="form-label">
-              Email address
-            </label>
-            <input
-              type="email"
-              id="email"
-              placeholder="Enter email"
-              {...register("email")}
-              className={`form-control ${errors.email ? "is-invalid" : ""}`}
+      {loading ? (
+        <Loader />
+      ) : (
+        <>
+          <div className="card p-4 shadow" style={{ width: "350px" }}>
+            <h2 className="text-center mb-4">Login</h2>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <div className="mb-3">
+                <label htmlFor="email" className="form-label">
+                  Email address
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  placeholder="Enter email"
+                  {...register("email")}
+                  className={`form-control ${errors.email ? "is-invalid" : ""}`}
+                />
+                {errors.email && (
+                  <p className="text-danger">{errors.email.message}</p>
+                )}
+              </div>
+              <div className="mb-3">
+                <label htmlFor="password" className="form-label">
+                  Password
+                </label>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className={`form-control ${
+                    errors.password ? "is-invalid" : ""
+                  }`}
+                  id="password"
+                  placeholder="Enter password"
+                  {...register("password")}
+                />
+                {errors.password && (
+                  <p className="text-danger">{errors.password.message}</p>
+                )}
+                <div className="form-check mt-2">
+                  <input
+                    type="checkbox"
+                    className="form-check-input"
+                    id="showPassword"
+                    checked={showPassword}
+                    onChange={togglePasswordVisibility}
+                  />
+                  <label className="form-check-label" htmlFor="showPassword">
+                    Show Password
+                  </label>
+                </div>
+              </div>
+              <button type="submit" className="btn btn-primary w-100">
+                Login
+              </button>
+            </form>
+            <GoogleLogin
+              onSuccess={googleSuccessResponse}
+              onError={googleErrorResponse}
             />
-            {errors.email && (
-              <p className="text-danger">{errors.email.message}</p>
-            )}
-          </div>
-          <div className="mb-3">
-            <label htmlFor="password" className="form-label">
-              Password
-            </label>
-            <input
-              type={showPassword ? "text" : "password"}
-              className={`form-control ${errors.password ? "is-invalid" : ""}`}
-              id="password"
-              placeholder="Enter password"
-              {...register("password")}
-            />
-            {errors.password && (
-              <p className="text-danger">{errors.password.message}</p>
-            )}
-            <div className="form-check mt-2">
-              <input
-                type="checkbox"
-                className="form-check-input"
-                id="showPassword"
-                checked={showPassword}
-                onChange={togglePasswordVisibility}
-              />
-              <label className="form-check-label" htmlFor="showPassword">
-                Show Password
-              </label>
+            <div className="text-center mt-3">
+              <a
+                onClick={() => navigate("/signup")}
+                className="text-decoration-none"
+              >
+                Don't have an account? Sign up
+              </a>
             </div>
           </div>
-          <button type="submit" className="btn btn-primary w-100">
-            Login
-          </button>
-        </form>
-        <GoogleLogin
-          onSuccess={googleSuccessResponse}
-          onError={googleErrorResponse}
-        />
-        <div className="text-center mt-3">
-          <a
-            onClick={() => navigate("/signup")}
-            className="text-decoration-none"
-          >
-            Don't have an account? Sign up
-          </a>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 };
