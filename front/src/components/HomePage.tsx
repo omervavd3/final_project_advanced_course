@@ -4,6 +4,7 @@ import Post from "./Post";
 import Navbar from "./NavBar";
 import AiModal from "./AiModal";
 import Loader from "./Loader";
+import { useNavigate } from "react-router-dom";
 
 type Post = {
   title: string;
@@ -27,10 +28,11 @@ const HomePage = () => {
   const [totalPages, setTotalPages] = useState<number>(1);
   const limit = 6;
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!document.cookie.includes("accessToken")) {
-      window.location.href = "/";
+      navigate("/");
     } else {
       setLoading(true);
       fetchPosts(currentPage);
@@ -56,7 +58,7 @@ const HomePage = () => {
             "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
           document.cookie =
             "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-          window.location.href = "/";
+          navigate("/");
         });
     }
   }, []);
@@ -94,10 +96,22 @@ const HomePage = () => {
     setIsModalOpen((prev) => !prev);
   };
 
+  const handleNavigateEditUser = () => {
+    navigate("/editUser");
+  }
+
+  const handleNavigateEditPost = (id: string) => {
+    navigate(`/editPost/${id}`);
+  }
+
+  const handleNavigateHome = () => {
+    navigate("/home");
+  }
+
   return (
     <div className="container mt-4">
       {/* Navbar */}
-      <Navbar userName={userName} profileImageUrl={profileImage} />
+      <Navbar userName={userName} profileImageUrl={profileImage} navigateEditUser={handleNavigateEditUser} navigateHome={handleNavigateHome} />
 
       {/* Posts Section */}
       <div className="row justify-content-center">
@@ -117,6 +131,7 @@ const HomePage = () => {
                     userName={userName}
                     ownerPhoto={post.ownerPhoto}
                     ownerName={post.ownerName}
+                    navigateEditPost={handleNavigateEditPost}
                   />
                 </div>
               ))

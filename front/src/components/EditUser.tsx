@@ -7,6 +7,7 @@ import avatar from "../assets/icons8-avatar-96.png";
 // import { useNavigate } from "react-router";
 import Post from "./Post";
 import Loader from "./Loader";
+import { useNavigate } from "react-router-dom";
 
 type Post = {
   title: string;
@@ -35,7 +36,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 const EditUser = () => {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -63,7 +64,7 @@ const EditUser = () => {
 
   useEffect(() => {
     if (!document.cookie.includes("accessToken")) {
-      window.location.href = "/";
+      navigate("/");
     }
     setLoading(true);
     const loadPageInfo = async () => {
@@ -175,7 +176,7 @@ const EditUser = () => {
         console.log(response);
         if (response.status === 200) {
           alert("User updated successfully");
-          window.location.reload();
+          navigate("/");
         }
       })
       .catch((error) => {
@@ -201,7 +202,7 @@ const EditUser = () => {
         console.log(response);
         if (response.status === 200) {
           alert("User deleted successfully");
-          window.location.href = "/";
+          navigate("/");
         }
       })
       .catch((error) => {
@@ -210,6 +211,10 @@ const EditUser = () => {
       });
     setLoading(false);
   };
+
+  const handleNavigateEditPost = (id: string) => {
+    navigate(`/editPost/${id}`);
+  }
 
   return (
     <div className="container mt-4">
@@ -221,7 +226,7 @@ const EditUser = () => {
             <h1 className="fw-bold">@{userName}</h1>
             <button
               className="btn btn-secondary"
-              onClick={() => (window.location.href = "/")}
+              onClick={() => (navigate("/"))}
             >
               Back to home page
             </button>
@@ -394,6 +399,7 @@ const EditUser = () => {
                             userName={userName}
                             ownerPhoto={post.ownerPhoto}
                             ownerName={post.ownerName}
+                            navigateEditPost={handleNavigateEditPost}
                           />
                         </div>
                       </div>
