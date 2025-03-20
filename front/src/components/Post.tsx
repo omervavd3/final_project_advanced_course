@@ -67,7 +67,7 @@ const Post: FC<PostProps> = ({
           }`,
         },
       })
-      .then((response) => {
+      .then((response:any) => {
         setLoading(false);
         console.log(response.data);
         setComments(response.data.comments);
@@ -137,7 +137,7 @@ const Post: FC<PostProps> = ({
           },
         }
       )
-      .then((response) => {
+      .then((response:any) => {
         setLoading(false);
         console.log(response.data);
         if (response.data.length === 0) {

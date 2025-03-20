@@ -3,7 +3,7 @@ import LikesModel from "../models/likesModel";
 import CommentModel from "../models/commentsModel";
 import PostModel from "../models/postModel";
 import UserModel from "../models/userModel";
-import bcrypt from "bcrypt";
+import bcrypt from 'bcryptjs';
 import { deleteFile } from "./multerController";
 import multer from "multer";
 import path from "path";

@@ -47,7 +47,7 @@ const EditPost = () => {
           }`,
         },
       })
-      .then((response) => {
+      .then((response:any) => {
         setTitle(response.data.title);
         setContent(response.data.content);
         setPostPhotoUrl(response.data.photo);
@@ -77,7 +77,7 @@ const EditPost = () => {
             "Content-Type": "image/jpeg",
           },
         })
-        .then((res) => {
+        .then((res:any) => {
           console.log(res);
           if (res.status !== 200) {
             alert("An error occurred. Please try again.");

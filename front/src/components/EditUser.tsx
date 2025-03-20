@@ -76,7 +76,7 @@ const EditUser = () => {
             }`,
           },
         })
-        .then((response) => {
+        .then((response:any) => {
           console.log(response);
           setProfileImage(response.data.profileImageUrl);
           setUserName(response.data.userName);
@@ -104,7 +104,7 @@ const EditUser = () => {
             },
           }
         )
-        .then((response) => {
+        .then((response:any) => {
           setLoading(false);
           console.log(response.data);
           setUserPosts(response.data);
@@ -141,7 +141,7 @@ const EditUser = () => {
             "Content-Type": "image/jpeg",
           },
         })
-        .then((res) => {
+        .then((res:any) => {
           console.log(res);
           if (res.status !== 200) {
             alert("An error occurred. Please try again.");
@@ -189,7 +189,7 @@ const EditUser = () => {
     setLoading(true);
     await axios
       .delete("http://localhost:3000/auth/deleteUser", {
-        data: { password: passwordForDelete },
+        params: { password: passwordForDelete },
         headers: {
           Authorization: `Bearer ${
             document.cookie.split("accessToken=")[1].split(";")[0]

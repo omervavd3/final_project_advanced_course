@@ -44,7 +44,7 @@ const AiModal: FC<ModalProps> = ({ isOpen, onClose }) => {
           },
         }
       )
-      .then((response) => {
+      .then((response:any) => {
         setLoading(false);
         setAiMessages(
           response.data.response.candidates[0].content.parts[0].text

@@ -44,7 +44,7 @@ const HomePage = () => {
             }`,
           },
         })
-        .then((response) => {
+        .then((response:any) => {
           setLoading(false);
           setProfileImage(response.data.profileImageUrl);
           setUserName(response.data.userName);
@@ -72,7 +72,7 @@ const HomePage = () => {
           }`,
         },
       })
-      .then((response) => {
+      .then((response:any) => {
         setLoading(false);
         setPosts(response.data.posts);
         setTotalPages(response.data.totalPages);

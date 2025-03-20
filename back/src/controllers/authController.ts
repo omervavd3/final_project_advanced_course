@@ -1,6 +1,6 @@
 import UserModel from "../models/userModel";
 import { Request, Response } from "express";
-import bcrypt from "bcrypt";
+import bcrypt from 'bcryptjs';
 import jwt from "jsonwebtoken";
 import { OAuth2Client } from "google-auth-library";
 const client = new OAuth2Client();
