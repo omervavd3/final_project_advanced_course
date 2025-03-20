@@ -31,6 +31,9 @@ import {
  *         owner:
  *           type: string
  *           description: ID of the owner of the comment
+ *         ownerName:
+ *           type: string
+ *           description: Name of the owner of the comment
  *         postId:
  *           type: string
  *           description: Post id of the comment
@@ -122,6 +125,9 @@ commentRouter
    *               postId:
    *                 type: string
    *                 example: "679b79213d4c2e12fcb96aa9"
+   *               ownerName:
+   *                 type: string
+   *                 example: "User Name"
    *     responses:
    *       201:
    *         description: New comment created
@@ -222,12 +228,86 @@ commentRouter
     commentDeleteMiddleware,
     commentController.deleteItemById.bind(commentController)
   )
-
+/**
+ * @swagger
+ * /comments/getByPostId/{postId}/{page}/{limit}:
+ *   get:
+ *     summary: Get comments by post ID with pagination
+ *     tags:
+ *       - Comment
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         description: ID of the post to retrieve comments for
+ *         schema:
+ *           type: string
+ *           example: "679b79213d4c2e12fcb96aa9"
+ *       - in: path
+ *         name: page
+ *         required: true
+ *         description: Page number for pagination
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *       - in: path
+ *         name: limit
+ *         required: true
+ *         description: Number of comments per page
+ *         schema:
+ *           type: integer
+ *           example: 10
+ *     responses:
+ *       200:
+ *         description: List of comments for the specified post
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Comment'
+ *       401:
+ *         description: No token provided
+ *       403:
+ *         description: Unauthorized
+ *       404:
+ *         description: Post not found
+ *       500:
+ *         description: Internal server error
+ */
   .get(
     "/getByPostId/:postId/:page/:limit",
     authController.autMiddleware,
     commentController.getByPostId.bind(commentController)
   )
+  /**
+ * @swagger
+ * /comments/getByUserId:
+ *   get:
+ *     summary: Get comments by user ID
+ *     tags:
+ *       - Comment
+ *     security:
+ *       - bearerAuth: []
+ *     description: Retrieve all comments made by the authenticated user. Requires access token.
+ *     responses:
+ *       200:
+ *         description: List of comments made by the user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Comment'
+ *       401:
+ *         description: No token provided
+ *       403:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
   .get(
     "/getByUserId",
     authController.autMiddleware,

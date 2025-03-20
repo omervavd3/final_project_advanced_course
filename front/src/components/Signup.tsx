@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import avatar from "../assets/icons8-avatar-96.png";
+import Loader from "./Loader";
 
 // Define apiClient using axios
 const apiClient = axios.create({
@@ -63,6 +64,7 @@ const Signup = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [image, setImage] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const {
     register,
@@ -88,7 +90,7 @@ const Signup = () => {
   };
 
   const onSubmit = (data: FormData) => {
-    //create new form data that includes image
+    setLoading(true);
     reset();
     const file = image;
     console.log("uploadImg");
@@ -105,6 +107,7 @@ const Signup = () => {
         .then((res) => {
           console.log(res);
           if (res.status !== 200) {
+            setLoading(false);
             alert("An error occurred. Please try again.");
             return;
           }
@@ -120,49 +123,61 @@ const Signup = () => {
             .then((response) => {
               console.log(response);
               if (response.status === 201) {
+                setLoading(false);
                 navigate("/");
               }
             })
             .catch((error) => {
+              setLoading(false);
               console.error(error);
               alert("An error occurred. Please try again.");
             });
         })
         .catch((err) => {
+          setLoading(false);
           console.log(err);
           alert("An error occurred. Please try again.");
         });
     } else {
+      setLoading(false);
       alert("Please upload an image");
     }
   };
 
   return (
     <div className="d-flex justify-content-center align-items-center bg-light">
-      <div
-        className="card p-4 shadow-lg"
-        style={{
-          width: "100%",
-          maxWidth: "400px",
-          borderRadius: "10px",
-          margin: "0 10px",
-        }}
-      >
-        <h2 className="text-center mb-4 font-weight-bold">Sign Up</h2>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="mb-3">
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                position: "relative",
-              }}
-            >
-              <img
-                src={image ? URL.createObjectURL(image) : avatar}
-                style={{ width: "200px", height: "200px", alignSelf: "center" }}
-              />
-              {/* <FontAwesomeIcon
+      {loading ? (
+        <Loader />
+      ) : (
+        <>
+          <div
+            className="card p-4 shadow-lg"
+            style={{
+              width: "100%",
+              maxWidth: "400px",
+              borderRadius: "10px",
+              margin: "0 10px",
+            }}
+          >
+            <h2 className="text-center mb-4 font-weight-bold">Sign Up</h2>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <div className="mb-3">
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    position: "relative",
+                  }}
+                >
+                  <img
+                    src={image ? URL.createObjectURL(image) : avatar}
+                    style={{
+                      width: "200px",
+                      height: "200px",
+                      alignSelf: "center",
+                    }}
+                  />
+                  {/* <FontAwesomeIcon
                 onClick={() => {
                   inputFileRef.current?.click();
                 }}
@@ -170,87 +185,97 @@ const Signup = () => {
                 className="fa-xl"
                 style={{ position: "absolute", bottom: "0", right: "0" }}
               /> */}
+                </div>
+                <input
+                  // {...rest}
+                  // ref={(e) => {
+                  //   ref(e);
+                  //   inputFileRef.current = e;
+                  // }}
+                  onChange={changeImage}
+                  type="file"
+                  className="mb-3"
+                  accept="image/jpeg, image/png"
+                  // style={{ display: "none" }}
+                />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="email" className="form-label">
+                  Email address
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  placeholder="Enter email"
+                  {...register("email")}
+                  className={`form-control ${errors.email ? "is-invalid" : ""}`}
+                />
+                {errors.email && (
+                  <div className="invalid-feedback">{errors.email.message}</div>
+                )}
+              </div>
+              <div className="mb-3">
+                <label htmlFor="name" className="form-label">
+                  User name
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  placeholder="Enter name"
+                  {...register("userName")}
+                  className={`form-control ${
+                    errors.userName ? "is-invalid" : ""
+                  }`}
+                />
+                {errors.userName && (
+                  <div className="invalid-feedback">
+                    {errors.userName.message}
+                  </div>
+                )}
+              </div>
+              <div className="mb-3">
+                <label htmlFor="password" className="form-label">
+                  Password
+                </label>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className={`form-control ${
+                    errors.password ? "is-invalid" : ""
+                  }`}
+                  id="password"
+                  placeholder="Enter password"
+                  {...register("password")}
+                />
+                {errors.password && (
+                  <div className="invalid-feedback">
+                    {errors.password.message}
+                  </div>
+                )}
+                <div className="form-check mt-2">
+                  <input
+                    type="checkbox"
+                    className="form-check-input"
+                    id="showPassword"
+                    checked={showPassword}
+                    onChange={togglePasswordVisibility}
+                  />
+                  <label className="form-check-label" htmlFor="showPassword">
+                    Show Password
+                  </label>
+                </div>
+              </div>
+              <button type="submit" className="btn btn-primary w-100 mt-3">
+                Sign up
+              </button>
+            </form>
+            <div className="text-center mt-3">
+              <a onClick={() => navigate("/")} className="text-decoration-none">
+                Have an account? Login
+              </a>
             </div>
-            <input
-              // {...rest}
-              // ref={(e) => {
-              //   ref(e);
-              //   inputFileRef.current = e;
-              // }}
-              onChange={changeImage}
-              type="file"
-              className="mb-3"
-              accept="image/jpeg, image/png"
-              // style={{ display: "none" }}
-            />
           </div>
-          <div className="mb-3">
-            <label htmlFor="email" className="form-label">
-              Email address
-            </label>
-            <input
-              type="email"
-              id="email"
-              placeholder="Enter email"
-              {...register("email")}
-              className={`form-control ${errors.email ? "is-invalid" : ""}`}
-            />
-            {errors.email && (
-              <div className="invalid-feedback">{errors.email.message}</div>
-            )}
-          </div>
-          <div className="mb-3">
-            <label htmlFor="name" className="form-label">
-              User name
-            </label>
-            <input
-              type="text"
-              id="name"
-              placeholder="Enter name"
-              {...register("userName")}
-              className={`form-control ${errors.userName ? "is-invalid" : ""}`}
-            />
-            {errors.userName && (
-              <div className="invalid-feedback">{errors.userName.message}</div>
-            )}
-          </div>
-          <div className="mb-3">
-            <label htmlFor="password" className="form-label">
-              Password
-            </label>
-            <input
-              type={showPassword ? "text" : "password"}
-              className={`form-control ${errors.password ? "is-invalid" : ""}`}
-              id="password"
-              placeholder="Enter password"
-              {...register("password")}
-            />
-            {errors.password && (
-              <div className="invalid-feedback">{errors.password.message}</div>
-            )}
-            <div className="form-check mt-2">
-              <input
-                type="checkbox"
-                className="form-check-input"
-                id="showPassword"
-                checked={showPassword}
-                onChange={togglePasswordVisibility}
-              />
-              <label className="form-check-label" htmlFor="showPassword">
-                Show Password
-              </label>
-            </div>
-          </div>
-          <button type="submit" className="btn btn-primary w-100 mt-3">
-            Sign up
-          </button>
-        </form>
-        <div className="text-center mt-3">
-          <a onClick={() => navigate("/")} className="text-decoration-none">
-            Have an account? Login
-          </a>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 };

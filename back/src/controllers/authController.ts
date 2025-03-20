@@ -14,7 +14,7 @@ const register = async (req: Request, res: Response) => {
       userName == null ||
       profileImageUrl == null
     ) {
-      res.status(404).send("Email, password and name are required");
+      res.status(404).send("Email, password,name ang profile image are required");
       return;
     }
     const user = await UserModel.findOne({ email });
@@ -123,7 +123,8 @@ const googleSignIn = async (req: Request, res: Response) => {
       idToken: req.body.credential,
       audience: process.env.GOOGLE_CLIENT_ID,
     });
-    const payload = ticket.getPayload();
+    const payload = await ticket.getPayload();
+    console.log(payload);
     const email = payload?.email;
     if (email) {
       let user = await UserModel.findOne({ email: email });
@@ -132,8 +133,11 @@ const googleSignIn = async (req: Request, res: Response) => {
           email: email,
           password: "google-signin",
           userName: payload?.name,
-          profileImageUrl: payload?.picture,
         });
+      }
+      if (payload?.picture) {
+        user.profileImageUrl = payload?.picture;
+        await user.save();
       }
 
       const tokens = await loginHelper(user, res);

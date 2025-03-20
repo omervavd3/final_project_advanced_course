@@ -6,6 +6,7 @@ import { z } from "zod";
 import avatar from "../assets/icons8-avatar-96.png";
 // import { useNavigate } from "react-router";
 import Post from "./Post";
+import Loader from "./Loader";
 
 type Post = {
   title: string;
@@ -54,6 +55,7 @@ const EditUser = () => {
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [passwordForDelete, setPasswordForDelete] = useState<string>("");
   const [isUserGoogle, setIsUserGoogle] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
 
   const togglePreviousPasswordVisibility = () => {
     setShowPreviousPassword((prev) => !prev);
@@ -63,6 +65,7 @@ const EditUser = () => {
     if (!document.cookie.includes("accessToken")) {
       window.location.href = "/";
     }
+    setLoading(true);
     const loadPageInfo = async () => {
       await axios
         .get("http://localhost:3000/auth/getUserInfo", {
@@ -80,7 +83,7 @@ const EditUser = () => {
           setUpdateName(response.data.userName);
           setUpdateEmail(response.data.email);
           setIsUserGoogle(response.data.isGoogleSignIn);
-          if(response.data.isGoogleSignIn) {
+          if (response.data.isGoogleSignIn) {
             setPasswordForDelete("google-signin");
           }
         })
@@ -102,10 +105,12 @@ const EditUser = () => {
           }
         )
         .then((response) => {
+          setLoading(false);
           console.log(response.data);
           setUserPosts(response.data);
         })
         .catch((error) => {
+          setLoading(false);
           console.error(error);
           setUserPosts([]);
         });
@@ -119,6 +124,7 @@ const EditUser = () => {
   };
 
   const onSubmit = async (data: FormData) => {
+    setLoading(true);
     console.log(data);
     reset();
     let url = updateProfileImage;
@@ -176,9 +182,11 @@ const EditUser = () => {
         console.error(error);
         alert("An error occurred. Please try again.");
       });
+    setLoading(false);
   };
 
   const handleDeleteUser = async () => {
+    setLoading(true);
     await axios
       .delete("http://localhost:3000/auth/deleteUser", {
         data: { password: passwordForDelete },
@@ -200,237 +208,260 @@ const EditUser = () => {
         console.error(error);
         alert("An error occurred. Please try again.");
       });
+    setLoading(false);
   };
 
   return (
     <div className="container mt-4">
-      <div className="text-center mb-4">
-        <h1 className="fw-bold">@{userName}</h1>
-        <button className="btn btn-secondary" onClick={() => window.location.href = "/"}>
-          Back to home page
-        </button>
-        <button
-          className="btn btn-danger"
-          onClick={() => setShowDeleteModal(true)}
-        >
-          Delete user
-        </button>
-      </div>
-
-      {profileImage && (
-        <div className="text-center mb-3">
-          <img
-            src={profileImage}
-            alt="Profile"
-            className="img-fluid rounded-circle border border-secondary"
-            style={{ width: "150px", height: "150px", objectFit: "cover" }}
-          />
-        </div>
-      )}
-
-      {!isUserGoogle && (
-        <div className="accordion" id="editProfileAccordion">
-        <div className="accordion-item">
-          <h2 className="accordion-header">
+      {loading ? (
+        <Loader />
+      ) : (
+        <>
+          <div className="text-center mb-4">
+            <h1 className="fw-bold">@{userName}</h1>
             <button
-              className="accordion-button collapsed"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#collapseProfile"
-              aria-expanded="false"
-              aria-controls="collapseProfile"
+              className="btn btn-secondary"
+              onClick={() => (window.location.href = "/")}
             >
-              Edit Profile
+              Back to home page
             </button>
-          </h2>
-          <div
-            id="collapseProfile"
-            className="accordion-collapse collapse"
-            data-bs-parent="#editProfileAccordion"
-          >
-            <div className="accordion-body">
-              <form onSubmit={handleSubmit(onSubmit)}>
-                <div className="mb-3 text-center">
-                  <img
-                    src={
-                      updateProfileImage
-                        ? URL.createObjectURL(updateProfileImage)
-                        : profileImage
-                    }
-                    className="rounded-circle border border-secondary"
-                    style={{
-                      width: "200px",
-                      height: "200px",
-                      objectFit: "cover",
-                    }}
-                  />
-                  <input
-                    type="file"
-                    className="form-control mt-3"
-                    accept="image/jpeg, image/png"
-                    onChange={changeUpdateImage}
-                  />
-                </div>
-
-                <div className="mb-3">
-                  <label htmlFor="name" className="form-label">
-                    User name
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="name"
-                    value={updateName}
-                    {...register("userName")}
-                    onChange={(e) => setUpdateName(e.target.value)}
-                  />
-                  {errors.userName && (
-                    <div className="invalid-feedback">
-                      {errors.userName.message}
-                    </div>
-                  )}
-                </div>
-
-                <div className="mb-3">
-                  <label htmlFor="email" className="form-label">
-                    User email
-                  </label>
-                  <input
-                    type="email"
-                    className="form-control"
-                    id="email"
-                    value={updateEmail}
-                    {...register("email")}
-                    onChange={(e) => setUpdateEmail(e.target.value)}
-                  />
-                  {errors.email && (
-                    <div className="invalid-feedback">
-                      {errors.email.message}
-                    </div>
-                  )}
-                </div>
-
-                <div className="mb-3">
-                  <label htmlFor="previousPassword" className="form-label">
-                    Enter previous password
-                  </label>
-                  <div className="input-group">
-                    <input
-                      type={showPreviousPassword ? "text" : "password"}
-                      className={`form-control ${
-                        errors.previousPassword ? "is-invalid" : ""
-                      }`}
-                      id="previousPassword"
-                      placeholder="Enter password"
-                      {...register("previousPassword")}
-                    />
-                    <button
-                      className="btn btn-outline-secondary"
-                      type="button"
-                      onClick={togglePreviousPasswordVisibility}
-                    >
-                      {showPreviousPassword ? "Hide" : "Show"}
-                    </button>
-                  </div>
-                  {errors.previousPassword && (
-                    <div className="invalid-feedback">
-                      {errors.previousPassword.message}
-                    </div>
-                  )}
-                </div>
-
-                <button type="submit" className="btn btn-primary w-100 mt-3">
-                  Update
-                </button>
-              </form>
-            </div>
+            <button
+              className="btn btn-danger"
+              onClick={() => setShowDeleteModal(true)}
+            >
+              Delete user
+            </button>
           </div>
-        </div>
-      </div>
-      )}
 
-      <div className="row justify-content-center">
-        {userPosts && userPosts.length > 0 ? (
-          [...userPosts]
-            .sort(
-              (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-            )
-            .map((post, index) => (
-              <div key={index} className="col-md-6 col-lg-4 mb-4">
-                <div>
-                  <Post
-                    title={post.title}
-                    content={post.content}
-                    photo={post.photo}
-                    likes={post.likes}
-                    _id={post._id}
-                    userName={userName}
-                    ownerPhoto={post.ownerPhoto}
-                    ownerName={post.ownerName}
-                  />
-                </div>
-              </div>
-            ))
-        ) : (
-          <div className="col-12 text-center">
-            <p className="text-muted">No posts available</p>
-          </div>
-        )}
-      </div>
-
-      {/* Delete Confirmation Modal */}
-      <div
-        className={`modal ${showDeleteModal ? "d-block" : "d-none"}`}
-        tabIndex={-1}
-        aria-labelledby="deleteModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title" id="deleteModalLabel">
-                Confirm Deletion
-              </h5>
-              <button
-                type="button"
-                className="btn-close"
-                onClick={() => setShowDeleteModal(false)}
-                aria-label="Close"
-              ></button>
-            </div>
-            {!isUserGoogle && (
-              <div className="modal-body">
-              <label htmlFor="password" className="form-label">
-                Enter Password to Delete
-              </label>
-              <input
-                type="password"
-                id="password"
-                className="form-control"
-                value={passwordForDelete}
-                onChange={(e) => setPasswordForDelete(e.target.value)}
+          {profileImage && (
+            <div className="text-center mb-3">
+              <img
+                src={profileImage}
+                alt="Profile"
+                className="img-fluid rounded-circle border border-secondary"
+                style={{ width: "150px", height: "150px", objectFit: "cover" }}
               />
             </div>
+          )}
+
+          {!isUserGoogle && (
+            <div className="accordion" id="editProfileAccordion">
+              <div className="accordion-item">
+                <h2 className="accordion-header">
+                  <button
+                    className="accordion-button collapsed"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapseProfile"
+                    aria-expanded="false"
+                    aria-controls="collapseProfile"
+                  >
+                    Edit Profile
+                  </button>
+                </h2>
+                <div
+                  id="collapseProfile"
+                  className="accordion-collapse collapse"
+                  data-bs-parent="#editProfileAccordion"
+                >
+                  <div className="accordion-body">
+                    <form onSubmit={handleSubmit(onSubmit)}>
+                      <div className="mb-3 text-center">
+                        <img
+                          src={
+                            updateProfileImage
+                              ? URL.createObjectURL(updateProfileImage)
+                              : profileImage
+                          }
+                          className="rounded-circle border border-secondary"
+                          style={{
+                            width: "200px",
+                            height: "200px",
+                            objectFit: "cover",
+                          }}
+                        />
+                        <input
+                          type="file"
+                          className="form-control mt-3"
+                          accept="image/jpeg, image/png"
+                          onChange={changeUpdateImage}
+                        />
+                      </div>
+
+                      <div className="mb-3">
+                        <label htmlFor="name" className="form-label">
+                          User name
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          id="name"
+                          value={updateName}
+                          {...register("userName")}
+                          onChange={(e) => setUpdateName(e.target.value)}
+                        />
+                        {errors.userName && (
+                          <div className="invalid-feedback">
+                            {errors.userName.message}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="mb-3">
+                        <label htmlFor="email" className="form-label">
+                          User email
+                        </label>
+                        <input
+                          type="email"
+                          className="form-control"
+                          id="email"
+                          value={updateEmail}
+                          {...register("email")}
+                          onChange={(e) => setUpdateEmail(e.target.value)}
+                        />
+                        {errors.email && (
+                          <div className="invalid-feedback">
+                            {errors.email.message}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="mb-3">
+                        <label
+                          htmlFor="previousPassword"
+                          className="form-label"
+                        >
+                          Enter previous password
+                        </label>
+                        <div className="input-group">
+                          <input
+                            type={showPreviousPassword ? "text" : "password"}
+                            className={`form-control ${
+                              errors.previousPassword ? "is-invalid" : ""
+                            }`}
+                            id="previousPassword"
+                            placeholder="Enter password"
+                            {...register("previousPassword")}
+                          />
+                          <button
+                            className="btn btn-outline-secondary"
+                            type="button"
+                            onClick={togglePreviousPasswordVisibility}
+                          >
+                            {showPreviousPassword ? "Hide" : "Show"}
+                          </button>
+                        </div>
+                        {errors.previousPassword && (
+                          <div className="invalid-feedback">
+                            {errors.previousPassword.message}
+                          </div>
+                        )}
+                      </div>
+
+                      <button
+                        type="submit"
+                        className="btn btn-primary w-100 mt-3"
+                      >
+                        Update
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="row justify-content-center">
+            {loading ? (
+              <Loader />
+            ) : (
+              <>
+                {userPosts && userPosts.length > 0 ? (
+                  [...userPosts]
+                    .sort(
+                      (a, b) =>
+                        new Date(b.date).getTime() - new Date(a.date).getTime()
+                    )
+                    .map((post, index) => (
+                      <div key={index} className="col-md-6 col-lg-4 mb-4">
+                        <div>
+                          <Post
+                            title={post.title}
+                            content={post.content}
+                            photo={post.photo}
+                            likes={post.likes}
+                            _id={post._id}
+                            userName={userName}
+                            ownerPhoto={post.ownerPhoto}
+                            ownerName={post.ownerName}
+                          />
+                        </div>
+                      </div>
+                    ))
+                ) : (
+                  <div className="col-12 text-center">
+                    <p className="text-muted">No posts available</p>
+                  </div>
+                )}
+              </>
             )}
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => setShowDeleteModal(false)}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                className="btn btn-danger"
-                onClick={handleDeleteUser}
-              >
-                Confirm Deletion
-              </button>
+          </div>
+
+          {/* Delete Confirmation Modal */}
+          <div
+            className={`modal ${showDeleteModal ? "d-block" : "d-none"}`}
+            tabIndex={-1}
+            aria-labelledby="deleteModalLabel"
+            aria-hidden="true"
+          >
+            <div className="modal-dialog">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title" id="deleteModalLabel">
+                    Confirm Deletion
+                  </h5>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    onClick={() => setShowDeleteModal(false)}
+                    aria-label="Close"
+                  ></button>
+                </div>
+                {!isUserGoogle && (
+                  <div className="modal-body">
+                    <label htmlFor="password" className="form-label">
+                      Enter Password to Delete
+                    </label>
+                    <input
+                      type="password"
+                      id="password"
+                      className="form-control"
+                      value={passwordForDelete}
+                      onChange={(e) => setPasswordForDelete(e.target.value)}
+                    />
+                  </div>
+                )}
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => setShowDeleteModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-danger"
+                    onClick={handleDeleteUser}
+                  >
+                    Confirm Deletion
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 };

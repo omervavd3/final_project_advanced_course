@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 // import { useNavigate } from "react-router";
 import { z } from "zod";
 import avatar from "../assets/icons8-avatar-96.png";
+import Loader from "./Loader";
 
 const apiClient = axios.create({
   baseURL: "http://localhost:3000",
@@ -22,7 +23,7 @@ const EditPost = () => {
   const [content, setContent] = useState<string>("");
   const [photo, setPhoto] = useState<File | null>(null);
   const [postPhotoUrl, setPostPhotoUrl] = useState<string>("");
-
+  const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
 
   const id = window.location.pathname.split("/")[2];
@@ -36,11 +37,14 @@ const EditPost = () => {
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   useEffect(() => {
+    setLoading(true);
     axios
       .get(`http://localhost:3000/posts/${id}`, {
         withCredentials: true,
         headers: {
-          Authorization: `Bearer ${document.cookie.split("accessToken=")[1].split(";")[0]}`,
+          Authorization: `Bearer ${
+            document.cookie.split("accessToken=")[1].split(";")[0]
+          }`,
         },
       })
       .then((response) => {
@@ -51,6 +55,7 @@ const EditPost = () => {
       .catch((error) => {
         console.error(error);
       });
+    setLoading(false);
   }, []);
 
   const changeUpdateImage = (e: any) => {
@@ -60,6 +65,7 @@ const EditPost = () => {
   };
 
   const updatePost = async (data: FormData) => {
+    setLoading(true);
     let url;
     if (photo && URL.createObjectURL(photo) !== postPhotoUrl) {
       const formData = new FormData();
@@ -99,7 +105,9 @@ const EditPost = () => {
           {
             withCredentials: true,
             headers: {
-              Authorization: `Bearer ${document.cookie.split("accessToken=")[1].split(";")[0]}`,
+              Authorization: `Bearer ${
+                document.cookie.split("accessToken=")[1].split(";")[0]
+              }`,
             },
           }
         )
@@ -111,14 +119,18 @@ const EditPost = () => {
           console.error(error);
         });
     }
+    setLoading(false);
   };
 
   const deletePost = async () => {
+    setLoading(true);
     await axios
       .delete(`http://localhost:3000/posts/${id}`, {
         withCredentials: true,
         headers: {
-          Authorization: `Bearer ${document.cookie.split("accessToken=")[1].split(";")[0]}`,
+          Authorization: `Bearer ${
+            document.cookie.split("accessToken=")[1].split(";")[0]
+          }`,
         },
       })
       .then((response) => {
@@ -130,6 +142,7 @@ const EditPost = () => {
         console.error(error);
         alert("An error occurred while deleting the post.");
       });
+    setLoading(false);
     setShowDeleteModal(false);
   };
 
@@ -141,110 +154,135 @@ const EditPost = () => {
 
   return (
     <div className="container mt-5 d-flex justify-content-center">
-      <div className="card shadow-lg p-4" style={{ width: "100%" }}>
-        <h1 className="text-center mb-4">Edit Post</h1>
+      {loading ? (
+        <Loader />
+      ) : (
+        <>
+          <div className="card shadow-lg p-4" style={{ width: "100%" }}>
+            <h1 className="text-center mb-4">Edit Post</h1>
 
-        {/* Back & Delete Buttons */}
-        <div className="d-flex justify-content-between mb-3">
-          <button onClick={() => window.location.href = "/"} className="btn btn-outline-primary">
-            <i className="bi bi-arrow-left"></i> Back to Home
-          </button>
-          <button
-            className="btn btn-danger"
-            onClick={() => setShowDeleteModal(true)}
-          >
-            <i className="bi bi-trash"></i> Delete Post
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit(onSubmit)}>
-          {/* Profile Image & Upload */}
-          <div className="text-center mb-4">
-            <img
-              src={postPhotoUrl || avatar}
-              className="border border-secondary rounded-circle"
-              style={{ width: "150px", height: "150px", objectFit: "cover" }}
-            />
-            <input
-              type="file"
-              className="form-control mt-3"
-              accept="image/jpeg, image/png"
-              onChange={changeUpdateImage}
-            />
-          </div>
-
-          {/* Title Input */}
-          <div className="mb-3">
-            <label htmlFor="title" className="form-label fw-bold">Title</label>
-            <input
-              type="text"
-              className={`form-control ${errors.title ? "is-invalid" : ""}`}
-              id="title"
-              value={title}
-              {...register("title")}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-            {errors.title && <div className="invalid-feedback">{errors.title.message}</div>}
-          </div>
-
-          {/* Content Input */}
-          <div className="mb-3">
-            <label htmlFor="content" className="form-label fw-bold">Content</label>
-            <textarea
-              className="form-control"
-              id="content"
-              rows={5}
-              value={content}
-              {...register("content")}
-              onChange={(e) => setContent(e.target.value)}
-            ></textarea>
-            {errors.content && <div className="invalid-feedback">{errors.content.message}</div>}
-          </div>
-
-          {/* Update Button */}
-          <button type="submit" className="btn btn-primary w-100 mt-3">
-            <i className="bi bi-pencil"></i> Update Post
-          </button>
-        </form>
-      </div>
-
-      {/* Delete Confirmation Modal */}
-      <div
-        className={`modal ${showDeleteModal ? "d-block" : "d-none"}`}
-        tabIndex={-1}
-        aria-labelledby="deleteModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+            {/* Back & Delete Buttons */}
+            <div className="d-flex justify-content-between mb-3">
               <button
-                type="button"
-                className="btn-close"
-                onClick={() => setShowDeleteModal(false)}
-                aria-label="Close"
-              ></button>
-            </div>
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => setShowDeleteModal(false)}
+                onClick={() => (window.location.href = "/")}
+                className="btn btn-outline-primary"
               >
-                Cancel
+                <i className="bi bi-arrow-left"></i> Back to Home
               </button>
               <button
-                type="button"
                 className="btn btn-danger"
-                onClick={deletePost}
+                onClick={() => setShowDeleteModal(true)}
               >
-                Confirm Deletion
+                <i className="bi bi-trash"></i> Delete Post
               </button>
             </div>
+
+            <form onSubmit={handleSubmit(onSubmit)}>
+              {/* Profile Image & Upload */}
+              <div className="text-center mb-4">
+                <img
+                  src={postPhotoUrl || avatar}
+                  className="border border-secondary rounded-circle"
+                  style={{
+                    width: "150px",
+                    height: "150px",
+                    objectFit: "cover",
+                  }}
+                />
+                <input
+                  type="file"
+                  className="form-control mt-3"
+                  accept="image/jpeg, image/png"
+                  onChange={changeUpdateImage}
+                />
+              </div>
+
+              {/* Title Input */}
+              <div className="mb-3">
+                <label htmlFor="title" className="form-label fw-bold">
+                  Title
+                </label>
+                <input
+                  type="text"
+                  className={`form-control ${errors.title ? "is-invalid" : ""}`}
+                  id="title"
+                  value={title}
+                  {...register("title")}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+                {errors.title && (
+                  <div className="invalid-feedback">{errors.title.message}</div>
+                )}
+              </div>
+
+              {/* Content Input */}
+              <div className="mb-3">
+                <label htmlFor="content" className="form-label fw-bold">
+                  Content
+                </label>
+                <textarea
+                  className="form-control"
+                  id="content"
+                  rows={5}
+                  value={content}
+                  {...register("content")}
+                  onChange={(e) => setContent(e.target.value)}
+                ></textarea>
+                {errors.content && (
+                  <div className="invalid-feedback">
+                    {errors.content.message}
+                  </div>
+                )}
+              </div>
+
+              {/* Update Button */}
+              <button type="submit" className="btn btn-primary w-100 mt-3">
+                <i className="bi bi-pencil"></i> Update Post
+              </button>
+            </form>
           </div>
-        </div>
-      </div>
+
+          {/* Delete Confirmation Modal */}
+          <div
+            className={`modal ${showDeleteModal ? "d-block" : "d-none"}`}
+            tabIndex={-1}
+            aria-labelledby="deleteModalLabel"
+            aria-hidden="true"
+          >
+            <div className="modal-dialog">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title" id="deleteModalLabel">
+                    Confirm Deletion
+                  </h5>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    onClick={() => setShowDeleteModal(false)}
+                    aria-label="Close"
+                  ></button>
+                </div>
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => setShowDeleteModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-danger"
+                    onClick={deletePost}
+                  >
+                    Confirm Deletion
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
