@@ -14,8 +14,8 @@ initApp().then((app) => {
     })
   }
 
-  const keyPath = path.join(__dirname, '../../../client-key.pem');
-  const certPath = path.join(__dirname, '../../../client-cert.pem');
+  const keyPath = path.join(__dirname, '../../../../client-key.pem');
+  const certPath = path.join(__dirname, '../../../../client-cert.pem');
 
   const options = {
     key: fs.readFileSync(`${keyPath}`),

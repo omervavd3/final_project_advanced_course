@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "cp .env_dev .env && tsc && nodemon ./src/app.ts",
-    "prod": "cp .env_prod .env && tsc && nodemon ./src/app.ts",
+    "prod": "cp .env_prod .env && tsc && node ./dist/src/app.js",
     "prod1": "cp .env_prod .env && tsc -p tsconfig_prod.json && node ./dist/src/app.ts",
     "start": "tsc && node ./dist/src/app.js",
     "postsTest": "jest --detectOpenHandles --coverage --forceExit --testPathPattern=posts",
