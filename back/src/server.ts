@@ -37,7 +37,7 @@ app.use("/likes", likesRouter);
 app.use("/ai", aiRouter);
 
 //swagger
-if (process.env.NODE_ENV == "development") {
+if (process.env.NODE_ENV == "development" || process.env.NODE_ENV == "production") {
   const options = {
     definition: {
       openapi: "3.0.0",
@@ -46,7 +46,7 @@ if (process.env.NODE_ENV == "development") {
         version: "1.0.0",
         description: "REST server including authentication using JWT",
       },
-      servers: [{ url: "http://localhost:3000" }],
+      servers: [{ url: "http://localhost:3000" }, { url: "http://10.10.246.38:80" }, {url: "https://node38.cs.colman.ac.il"}],
     },
     apis: ["./src/routes/*.ts"],
   };

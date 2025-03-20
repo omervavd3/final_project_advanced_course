@@ -3,7 +3,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 
-const base = `http://${process.env.DOMAIN_BASE || "localhost"}:${
+const base = `${process.env.DOMAIN_BASE || "http://localhost"}:${
   process.env.PORT || 3000
 }/`;
 
