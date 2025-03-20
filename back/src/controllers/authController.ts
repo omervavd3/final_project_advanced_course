@@ -14,7 +14,7 @@ const register = async (req: Request, res: Response) => {
       userName == null ||
       profileImageUrl == null
     ) {
-      res.status(404).send("Email, password and name are required");
+      res.status(404).send("Email, password,name ang profile image are required");
       return;
     }
     const user = await UserModel.findOne({ email });

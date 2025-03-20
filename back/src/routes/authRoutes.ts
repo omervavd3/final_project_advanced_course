@@ -44,10 +44,14 @@ import {
  *        userName:
  *          type: string
  *          description: Name of the user
+ *        profileImageUrl:
+ *          type: string
+ *          description: Profile image url of the user
  *      example:
  *        email: 'example@mail.com'
  *        password: '1234'
  *        userName: 'name'
+ *        profileImageUrl: 'www.image.com'
  */
 
 /**
@@ -100,6 +104,25 @@ authRouter
    *        description: Internal server error
    */
   .post("/register", authController.register)
+    /**
+   * @swagger
+   * /auth/google:
+   *  post:
+   *    summary: Register/Login a user via google
+   *    tags:
+   *      - Auth
+   *    responses:
+   *      200:
+   *        description: User registered/logged in successfully
+   *        content:
+   *          application/json:
+   *            schema:
+   *              $ref: '#components/schemas/User'
+   *      400:
+   *         description: No email found in google account
+   *      500:
+   *        description: Internal server error
+   */
   .post("/google", authController.googleSignIn)
   /**
    * @swagger
@@ -193,6 +216,8 @@ authRouter
    *      200:
    *        description: User logged out successfully
    *      401:
+   *        description: No token provided
+   *      403:
    *        description: Unauthorized
    *      500:
    *        description: Internal server error
@@ -218,9 +243,52 @@ authRouter
    *      401:
    *        description: Unauthorized
    *      403:
-   *        description: Invalid refresh token
+   *        description: Unauthorized
    *      500:
    *        description: Internal server error
+   */
+  .post("/refresh", authController.refreshToken)
+    /**
+   * @swagger
+   * /auth:
+   *   put:
+   *     summary: Updates user info, user must be logged in and provide correct password
+   *     tags:
+   *       - Auth
+   *     security:
+   *       - bearerAuth: []
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               password:
+   *                 type: string
+   *                 example: '1234'
+   *               profileImageUrl:
+   *                 type: string
+   *                 example: 'www.image.com'
+   *               email:
+   *                 type: string
+   *                 example: 'example@mail.com'
+   *               userName:
+   *                 type: string
+   *                 example: 'User Name'
+   *     responses:
+   *       200:
+   *         description: User password updated successfully
+   *       401:
+   *         description: No token provided
+   *       402:
+   *         description: Invalid password
+   *       403:
+   *         description: Unauthorized
+   *       404:
+   *         description: User not found
+   *       500:
+   *         description: Internal server error
    */
   .put(
     "/",
@@ -228,13 +296,115 @@ authRouter
     authUpdateMiddleWare,
     authController.updateUser
   )
-  .post("/refresh", authController.refreshToken)
+ /**
+ * @swagger
+ * /auth/getUserInfo:
+ *   get:
+ *     summary: Get user info
+ *     tags:
+ *       - Auth
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User information retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 userName:
+ *                   type: string
+ *                   example: 'User Name'
+ *                 email:
+ *                   type: string
+ *                   example: 'example@mail.com'
+ *                 profileImageUrl:
+ *                   type: string
+ *                   example: 'www.image.com'
+ *                 isGoogleSignIn:
+ *                   type: boolean
+ *                   example: false
+ *       401:
+ *         description: No token provided
+ *       403:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal server error
+ */
   .get("/getUserInfo", authController.autMiddleware, authController.getUserInfo)
+   /**
+ * @swagger
+ * /auth/getProfileImageUrlAndName:
+ *   get:
+ *     summary: Get user profile image and name
+ *     tags:
+ *       - Auth
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User information retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 userName:
+ *                   type: string
+ *                   example: 'User Name'
+ *                 profileImageUrl:
+ *                   type: string
+ *                   example: 'www.image.com'
+ *       401:
+ *         description: No token provided
+ *       403:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal server error
+ */
   .get(
     "/getProfileImageUrlAndName",
     authController.autMiddleware,
     authController.getProfileImageUrlAndName
   )
+ /**
+ * @swagger
+ * /auth/deleteUser:
+ *   delete:
+ *     summary: Delete a user, including their posts, comments, and likes
+ *     tags:
+ *       - Auth
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               password:
+ *                 type: string
+ *                 example: '1234'
+ *     responses:
+ *       200:
+ *         description: User deleted successfully
+ *       401:
+ *         description: No token provided
+ *       402:
+ *         description: Invalid password
+ *       403:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal server error
+ */
   .delete(
     "/deleteUser",
     authController.autMiddleware,
