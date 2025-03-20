@@ -14,7 +14,9 @@ const register = async (req: Request, res: Response) => {
       userName == null ||
       profileImageUrl == null
     ) {
-      res.status(404).send("Email, password,name ang profile image are required");
+      res
+        .status(404)
+        .send("Email, password,name ang profile image are required");
       return;
     }
     const user = await UserModel.findOne({ email });
@@ -133,6 +135,7 @@ const googleSignIn = async (req: Request, res: Response) => {
           email: email,
           password: "google-signin",
           userName: payload?.name,
+          profileImageUrl: payload?.picture,
         });
       }
       if (payload?.picture) {
