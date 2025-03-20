@@ -19,9 +19,6 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'], 
 }));
 
-app.use((req,res) => {
-  res.header("Access-Control-Allow-Credentials", "true");
-})
 
 
 app.use(cookieParser());
@@ -60,6 +57,18 @@ if (process.env.NODE_ENV == "development" || process.env.NODE_ENV == "production
 
 app.use(express.static(path.join(__dirname, "../public")));
 app.use(express.static(path.join(__dirname, "../front")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../../front", "index.html"));
+});
+
+// app.use(express.static(path.join(__dirname, "../../front"), {
+//   setHeaders: (res, path) => {
+//     if (path.endsWith('.js')) {
+//       res.set('Content-Type', 'application/javascript');
+//     }
+//   }
+// }));
 
 
 const initApp = () => {
