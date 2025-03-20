@@ -242,6 +242,7 @@ const Post: FC<PostProps> = ({
             {userName === ownerName && (
               <span
                 className="ms-2 text-primary cursor-pointer"
+                style={{ cursor: 'pointer' }}
                 onClick={() => handleEditPost(_id)}
               >
                 Edit
@@ -272,7 +273,7 @@ const Post: FC<PostProps> = ({
                 alt="like"
                 className="me-2 cursor-pointer"
                 onClick={handleLike}
-                style={{ width: "24px" }}
+                style={{ width: "24px", cursor: 'pointer' }}
               />
             </div>
           </div>
@@ -315,7 +316,7 @@ const Post: FC<PostProps> = ({
                     alt="delete"
                     className="cursor-pointer ms-2"
                     onClick={() => handleDeleteComment(comment._id)}
-                    style={{ width: "16px", height: "16px" }}
+                    style={{ width: "16px", height: "16px", cursor: 'pointer' }}
                   />
                 )}
               </div>
@@ -328,6 +329,7 @@ const Post: FC<PostProps> = ({
               <button
                 className="btn btn-sm text-muted"
                 onClick={() => setPage(page - 1)}
+                style={{ cursor: 'pointer' }}
               >
                 Load previous
               </button>
@@ -336,6 +338,7 @@ const Post: FC<PostProps> = ({
               <button
                 className="btn btn-sm text-muted"
                 onClick={() => setPage(page + 1)}
+                style={{ cursor: 'pointer' }}
               >
                 Load more
               </button>
