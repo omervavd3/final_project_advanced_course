@@ -39,9 +39,16 @@ export const deleteFile = (req: Request, res: Response) => {
   try {
     const fileName = req.params.fileName;
 
-    let filePath = path.join(__dirname, "../public", fileName);
+    // let filePath;
+    let filePath = path.join(__dirname + "../public", fileName);
+
+
+    if (process.env.MULTER_PATH_ENV == "test") {
+      filePath = path.join(__dirname + "public", fileName);
+    }
 
     filePath = filePath.replace("src\\", "").replace(/\\/g, "/");
+    filePath = filePath.replace(/dist\/src\//, "").replace(/\\/g, "/");
 
     console.log("File path to delete:", filePath);
 

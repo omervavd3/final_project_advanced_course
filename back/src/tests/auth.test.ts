@@ -400,26 +400,6 @@ describe("User Tests", () => {
     expect(response.statusCode).toBe(200);
   });
 
-  test("Auth test delete user with wrong password", async () => {
-    const response = await request(app)
-      .delete("/auth/deleteUser")
-      .set({
-        Authorization: `JWT ${testUser.accessToken}`,
-      })
-      .send({
-        password: "wrongPassword",
-      });
-    expect(response.statusCode).not.toBe(200);
-  });
-
-  test("Auth test delete user without password", async () => {
-    const response = await request(app)
-      .delete("/auth/deleteUser")
-      .set({
-        Authorization: `JWT ${testUser.accessToken}`,
-      });
-    expect(response.statusCode).not.toBe(200);
-  });
 
   test("Auth test delete user", async () => {
     const response = await request(app).post("/auth/register").send({
@@ -440,9 +420,6 @@ describe("User Tests", () => {
       .set({
         Authorization: `JWT ${accessToken}`,
       })
-      .send({
-        password: "test",
-      });
     expect(response3.statusCode).toBe(200);
   });
 

@@ -20,6 +20,7 @@ export const deleteImageMiddleware = async (
     let filePath = path.join(__dirname, "../public", fileName);
 
     filePath = filePath.replace("src\\", "").replace(/\\/g, "/");
+    filePath = filePath.replace(/dist\/src\//, "").replace(/\\/g, "/");
 
     console.log("File path to delete:", filePath);
 
@@ -268,11 +269,6 @@ export const authDeleteMiddleware = async (
 ): Promise<void> => {
   try {
     const userId = req.params.userId;
-    // const password = req.body.password;
-    // if (!password) {
-    //   res.status(404).send("Password is required");
-    //   return;
-    // }
     const user = await UserModel.findById(userId);
     if (user == null) {
       res.status(404).send("User not found");
@@ -280,11 +276,6 @@ export const authDeleteMiddleware = async (
     }
     console.log(user.password);
     if (user.password != "google-signin") {
-      // const valid = await bcrypt.compare(password, user.password);
-      // if (!valid) {
-      //   res.status(402).send("Invalid password");
-      //   return;
-      // }
       const profileImageUrlForDelete = user.profileImageUrl;
       if (profileImageUrlForDelete) {
         const fileName = profileImageUrlForDelete.split("/").pop() || "";
@@ -302,9 +293,11 @@ export const authDeleteMiddleware = async (
     const likes = await LikesModel.find({ owner: userId });
     if (likes.length > 0) {
       likes.forEach(async (like) => {
-        const post = await PostModel.find({ _id: like.postId });
-        post[0].likes -= 1;
-        await post[0].save();
+        const post = await PostModel.findById( like.postId );
+        if(post) {
+          post.likes -= 1;
+          await post.save();
+        }
       });
       await LikesModel.deleteMany({ owner: userId });
     }

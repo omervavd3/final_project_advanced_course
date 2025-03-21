@@ -5,6 +5,7 @@ import PostModel from "../models/postModel";
 import UserModel from "../models/userModel";
 import CommentModel from "../models/commentsModel";
 import { Express } from "express";
+import Test from "supertest/lib/test";
 
 var app: Express;
 
@@ -27,7 +28,7 @@ const testUser: User = {
 
 const testUser2: User = {
   email: "example2@email.com",
-  password: "6789",
+  password: "google-signin",
   userName: "j.v",
   profileImageUrl: "https://www.google.com",
 };
@@ -167,6 +168,8 @@ afterAll(async () => {
   mongoose.connection.close();
 });
 
+let accessTokenForTest = testUser2.accessToken
+
 describe("User Middlewares Tests", () => {
   test("Test user update", async () => {
     const res = await request(app)
@@ -188,9 +191,6 @@ describe("User Middlewares Tests", () => {
       .set({
         Authorization: `JWT ${testUser.accessToken}`,
       })
-      .send({
-        password: testUser.password,
-      });
     expect(res.statusCode).toBe(200);
   });
 });

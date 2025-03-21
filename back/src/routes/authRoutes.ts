@@ -381,16 +381,6 @@ authRouter
  *       - Auth
  *     security:
  *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               password:
- *                 type: string
- *                 example: '1234'
  *     responses:
  *       200:
  *         description: User deleted successfully
