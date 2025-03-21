@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import avatar from "../assets/icons8-avatar-96.png";
 import Loader from "./Loader";
+import { useNavigate } from "react-router-dom";
 
 const apiClient = axios.create({
   baseURL: "https://node38.cs.colman.ac.il",
@@ -28,7 +29,7 @@ const EditPost = () => {
 
   const id = window.location.pathname.split("/")[2];
 
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -47,7 +48,7 @@ const EditPost = () => {
           }`,
         },
       })
-      .then((response) => {
+      .then((response:any) => {
         setTitle(response.data.title);
         setContent(response.data.content);
         setPostPhotoUrl(response.data.photo);
@@ -77,7 +78,7 @@ const EditPost = () => {
             "Content-Type": "image/jpeg",
           },
         })
-        .then((res) => {
+        .then((res:any) => {
           console.log(res);
           if (res.status !== 200) {
             alert("An error occurred. Please try again.");
@@ -136,7 +137,7 @@ const EditPost = () => {
       .then((response) => {
         console.log(response);
         alert("Post deleted successfully");
-        window.location.href = "/";
+        navigate("/");
       })
       .catch((error) => {
         console.error(error);
@@ -164,7 +165,7 @@ const EditPost = () => {
             {/* Back & Delete Buttons */}
             <div className="d-flex justify-content-between mb-3">
               <button
-                onClick={() => (window.location.href = "/")}
+                onClick={() => (navigate("/"))}
                 className="btn btn-outline-primary"
               >
                 <i className="bi bi-arrow-left"></i> Back to Home

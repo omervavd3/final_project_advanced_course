@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import heart_black from "../assets/heart_black.png";
 import heart_red from "../assets/heart_red.png";
-// import { useNavigate } from "react-router";
 import trash from "../assets/trash.png";
 import Loader from "./Loader";
 
@@ -18,6 +17,7 @@ type PostProps = {
   userName: string;
   ownerName: string;
   ownerPhoto: string;
+  navigateEditPost: (id: string) => void;
 };
 
 type comment = {
@@ -35,12 +35,12 @@ const Post: FC<PostProps> = ({
   userName,
   ownerName,
   ownerPhoto,
+  navigateEditPost
 }) => {
   const schema = z.object({
     comment: z.string().nonempty("Comment is required"),
   });
 
-  // const navigate = useNavigate();
 
   const [liked, setLiked] = useState(false);
   const [heart, setHeart] = useState(heart_black);
@@ -67,7 +67,7 @@ const Post: FC<PostProps> = ({
           }`,
         },
       })
-      .then((response) => {
+      .then((response:any) => {
         setLoading(false);
         console.log(response.data);
         setComments(response.data.comments);
@@ -137,7 +137,7 @@ const Post: FC<PostProps> = ({
           },
         }
       )
-      .then((response) => {
+      .then((response:any) => {
         setLoading(false);
         console.log(response.data);
         if (response.data.length === 0) {
@@ -216,8 +216,7 @@ const Post: FC<PostProps> = ({
   };
 
   const handleEditPost = (_id: string) => {
-    // navigate(`/editPost/${_id}`);
-    window.location.href = `/editPost/${_id}`;
+    navigateEditPost(_id);
   };
 
   return (

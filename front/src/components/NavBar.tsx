@@ -1,16 +1,20 @@
 import { FC, useState } from "react";
-// import { useNavigate } from "react-router-dom";
 import AddPost from "./AddPost"; // Import your AddPost component
 import Logout from "./Logout";
 
 type NavbarProps = {
   userName: string;
   profileImageUrl: string;
+  navigateEditUser: () => void;
+  navigateHome: () => void;
 };
 
-const Navbar: FC<NavbarProps> = ({ userName, profileImageUrl }) => {
+const Navbar: FC<NavbarProps> = ({ userName, profileImageUrl, navigateEditUser, navigateHome }) => {
   const [showModal, setShowModal] = useState(false);
-  // const navigate = useNavigate();
+
+  const handleNavigateHome = () => {
+    navigateHome();
+  }
 
   return (
     <>
@@ -63,7 +67,7 @@ const Navbar: FC<NavbarProps> = ({ userName, profileImageUrl }) => {
               <li className="nav-item ms-3">
                 <button
                   className="btn btn-outline-secondary rounded-pill px-3"
-                  onClick={() => window.location.href = "/editUser"}
+                  onClick={() => navigateEditUser()}
                   style={{minWidth: "125px", margin:"5px 0"}}
                 >
                   ✏️ Edit User
@@ -72,7 +76,7 @@ const Navbar: FC<NavbarProps> = ({ userName, profileImageUrl }) => {
 
               {/* Logout */}
               <li className="nav-item ms-3">
-                <Logout />
+                <Logout navigateHome={handleNavigateHome}/>
               </li>
             </ul>
           </div>
@@ -101,6 +105,7 @@ const Navbar: FC<NavbarProps> = ({ userName, profileImageUrl }) => {
                 <AddPost
                   userName={userName}
                   profileImageUrl={profileImageUrl}
+                  navigateHome={navigateHome}
                 />
               </div>
               <div className="modal-footer">

@@ -9,6 +9,7 @@ import Loader from "./Loader";
 type AddPostProps = {
   userName: string;
   profileImageUrl: string;
+  navigateHome: () => void;
 };
 
 const apiClient = axios.create({
@@ -22,7 +23,7 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-const AddPost: FC<AddPostProps> = ({ userName, profileImageUrl }) => {
+const AddPost: FC<AddPostProps> = ({ userName, profileImageUrl, navigateHome }) => {
   const [loading, setLoading] = useState(false);
   const [image, setImage] = useState<File | null>(null);
 
@@ -53,7 +54,7 @@ const AddPost: FC<AddPostProps> = ({ userName, profileImageUrl }) => {
             "Content-Type": "image/jpeg",
           },
         })
-        .then((res) => {
+        .then((res:any) => {
           console.log(res);
           if (res.status !== 200) {
             setLoading(false);
@@ -82,7 +83,7 @@ const AddPost: FC<AddPostProps> = ({ userName, profileImageUrl }) => {
               console.log(response);
               if (response.status === 201) {
                 alert("Post created successfully");
-                window.location.reload();
+                navigateHome();
               }
             })
             .catch((error) => {

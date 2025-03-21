@@ -1,6 +1,11 @@
 import axios from "axios";
+import { FC } from "react";
 
-const Logout = () => {
+interface LogoutProps {
+  navigateHome: () => void;
+}
+
+const Logout:FC<LogoutProps> = ({navigateHome}) => {
   const logout = () => {
     axios
       .post(
@@ -18,7 +23,7 @@ const Logout = () => {
       .then((response) => {
         console.log(response.data);
         if (response.status == 200) {
-          window.location.href = "/";
+          navigateHome();
         }
       })
       .catch((error) => {

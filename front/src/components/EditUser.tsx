@@ -7,6 +7,7 @@ import avatar from "../assets/icons8-avatar-96.png";
 // import { useNavigate } from "react-router";
 import Post from "./Post";
 import Loader from "./Loader";
+import { useNavigate } from "react-router-dom";
 
 type Post = {
   title: string;
@@ -35,7 +36,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 const EditUser = () => {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -53,7 +54,7 @@ const EditUser = () => {
   const [showPreviousPassword, setShowPreviousPassword] = useState(false);
   const [userPosts, setUserPosts] = useState<Post[]>([]);
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
-  const [passwordForDelete, setPasswordForDelete] = useState<string>("");
+  // const [passwordForDelete, setPasswordForDelete] = useState<string>("");
   const [isUserGoogle, setIsUserGoogle] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
 
@@ -63,7 +64,7 @@ const EditUser = () => {
 
   useEffect(() => {
     if (!document.cookie.includes("accessToken")) {
-      window.location.href = "/";
+      navigate("/");
     }
     setLoading(true);
     const loadPageInfo = async () => {
@@ -76,16 +77,16 @@ const EditUser = () => {
             }`,
           },
         })
-        .then((response) => {
+        .then((response:any) => {
           console.log(response);
           setProfileImage(response.data.profileImageUrl);
           setUserName(response.data.userName);
           setUpdateName(response.data.userName);
           setUpdateEmail(response.data.email);
           setIsUserGoogle(response.data.isGoogleSignIn);
-          if (response.data.isGoogleSignIn) {
-            setPasswordForDelete("google-signin");
-          }
+          // if (response.data.isGoogleSignIn) {
+          //   setPasswordForDelete("google-signin");
+          // }
         })
         .catch((error) => {
           console.error(error);
@@ -104,7 +105,7 @@ const EditUser = () => {
             },
           }
         )
-        .then((response) => {
+        .then((response:any) => {
           setLoading(false);
           console.log(response.data);
           setUserPosts(response.data);
@@ -141,7 +142,7 @@ const EditUser = () => {
             "Content-Type": "image/jpeg",
           },
         })
-        .then((res) => {
+        .then((res:any) => {
           console.log(res);
           if (res.status !== 200) {
             alert("An error occurred. Please try again.");
@@ -175,7 +176,7 @@ const EditUser = () => {
         console.log(response);
         if (response.status === 200) {
           alert("User updated successfully");
-          window.location.reload();
+          navigate("/");
         }
       })
       .catch((error) => {
@@ -189,7 +190,7 @@ const EditUser = () => {
     setLoading(true);
     await axios
       .delete("https://node38.cs.colman.ac.il/auth/deleteUser", {
-        data: { password: passwordForDelete },
+        // data: { password: passwordForDelete },
         headers: {
           Authorization: `Bearer ${
             document.cookie.split("accessToken=")[1].split(";")[0]
@@ -201,7 +202,7 @@ const EditUser = () => {
         console.log(response);
         if (response.status === 200) {
           alert("User deleted successfully");
-          window.location.href = "/";
+          navigate("/");
         }
       })
       .catch((error) => {
@@ -210,6 +211,10 @@ const EditUser = () => {
       });
     setLoading(false);
   };
+
+  const handleNavigateEditPost = (id: string) => {
+    navigate(`/editPost/${id}`);
+  }
 
   return (
     <div className="container mt-4">
@@ -221,7 +226,7 @@ const EditUser = () => {
             <h1 className="fw-bold">@{userName}</h1>
             <button
               className="btn btn-secondary"
-              onClick={() => (window.location.href = "/")}
+              onClick={() => (navigate("/"))}
             >
               Back to home page
             </button>
@@ -394,6 +399,7 @@ const EditUser = () => {
                             userName={userName}
                             ownerPhoto={post.ownerPhoto}
                             ownerName={post.ownerName}
+                            navigateEditPost={handleNavigateEditPost}
                           />
                         </div>
                       </div>
@@ -427,7 +433,7 @@ const EditUser = () => {
                     aria-label="Close"
                   ></button>
                 </div>
-                {!isUserGoogle && (
+                {/* {!isUserGoogle && (
                   <div className="modal-body">
                     <label htmlFor="password" className="form-label">
                       Enter Password to Delete
@@ -440,7 +446,7 @@ const EditUser = () => {
                       onChange={(e) => setPasswordForDelete(e.target.value)}
                     />
                   </div>
-                )}
+                )} */}
                 <div className="modal-footer">
                   <button
                     type="button"

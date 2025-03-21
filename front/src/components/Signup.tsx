@@ -104,7 +104,7 @@ const Signup = () => {
             "Content-Type": "image/jpeg",
           },
         })
-        .then((res) => {
+        .then((res:any) => {
           console.log(res);
           if (res.status !== 200) {
             setLoading(false);

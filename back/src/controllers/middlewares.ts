@@ -268,11 +268,11 @@ export const authDeleteMiddleware = async (
 ): Promise<void> => {
   try {
     const userId = req.params.userId;
-    const password = req.body.password;
-    if (!password) {
-      res.status(404).send("Password is required");
-      return;
-    }
+    // const password = req.body.password;
+    // if (!password) {
+    //   res.status(404).send("Password is required");
+    //   return;
+    // }
     const user = await UserModel.findById(userId);
     if (user == null) {
       res.status(404).send("User not found");
@@ -280,11 +280,11 @@ export const authDeleteMiddleware = async (
     }
     console.log(user.password);
     if (user.password != "google-signin") {
-      const valid = await bcrypt.compare(password, user.password);
-      if (!valid) {
-        res.status(402).send("Invalid password");
-        return;
-      }
+      // const valid = await bcrypt.compare(password, user.password);
+      // if (!valid) {
+      //   res.status(402).send("Invalid password");
+      //   return;
+      // }
       const profileImageUrlForDelete = user.profileImageUrl;
       if (profileImageUrlForDelete) {
         const fileName = profileImageUrlForDelete.split("/").pop() || "";
