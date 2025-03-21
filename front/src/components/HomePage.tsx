@@ -105,7 +105,7 @@ const HomePage = () => {
   }
 
   const handleNavigateHome = () => {
-    navigate("/home");
+    navigate("/");
   }
 
   return (
