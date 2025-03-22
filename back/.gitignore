@@ -3,3 +3,9 @@ coverage/
 dist/
 openssl-secret.txt
 build/
+
+# dotenv environment variable files
+.env
+.env_prod
+.env_test
+.env_dev

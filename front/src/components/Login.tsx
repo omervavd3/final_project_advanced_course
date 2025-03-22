@@ -180,6 +180,7 @@ const Login = () => {
               <a
                 onClick={() => navigate("/signup")}
                 className="text-decoration-none"
+                style={{ cursor: 'pointer' }}
               >
                 Don't have an account? Sign up
               </a>

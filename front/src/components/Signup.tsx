@@ -91,7 +91,7 @@ const Signup = () => {
 
   const onSubmit = (data: FormData) => {
     setLoading(true);
-    reset();
+    
     const file = image;
     console.log("uploadImg");
     console.log(file);
@@ -124,6 +124,7 @@ const Signup = () => {
               console.log(response);
               if (response.status === 201) {
                 setLoading(false);
+                reset();
                 navigate("/");
               }
             })
@@ -131,12 +132,14 @@ const Signup = () => {
               setLoading(false);
               console.error(error);
               alert("An error occurred. Please try again.");
+              reset();
             });
         })
         .catch((err) => {
           setLoading(false);
           console.log(err);
           alert("An error occurred. Please try again.");
+          reset();
         });
     } else {
       setLoading(false);
@@ -175,28 +178,15 @@ const Signup = () => {
                       width: "200px",
                       height: "200px",
                       alignSelf: "center",
+                      objectFit: "cover"
                     }}
                   />
-                  {/* <FontAwesomeIcon
-                onClick={() => {
-                  inputFileRef.current?.click();
-                }}
-                icon={faImage}
-                className="fa-xl"
-                style={{ position: "absolute", bottom: "0", right: "0" }}
-              /> */}
                 </div>
                 <input
-                  // {...rest}
-                  // ref={(e) => {
-                  //   ref(e);
-                  //   inputFileRef.current = e;
-                  // }}
                   onChange={changeImage}
                   type="file"
-                  className="mb-3"
+                 className="form-control mb-3"
                   accept="image/jpeg, image/png"
-                  // style={{ display: "none" }}
                 />
               </div>
               <div className="mb-3">
@@ -269,7 +259,7 @@ const Signup = () => {
               </button>
             </form>
             <div className="text-center mt-3">
-              <a onClick={() => navigate("/")} className="text-decoration-none">
+              <a onClick={() => navigate("/")} className="text-decoration-none" style={{ cursor: 'pointer' }}>
                 Have an account? Login
               </a>
             </div>

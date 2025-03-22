@@ -40,7 +40,7 @@ const AddPost: FC<AddPostProps> = ({ userName, profileImageUrl, navigateHome }) 
   };
 
   const onSubmit = (data: FormData) => {
-    reset();
+    
     const file = image;
     console.log("uploadImg");
     console.log(file);
@@ -59,6 +59,7 @@ const AddPost: FC<AddPostProps> = ({ userName, profileImageUrl, navigateHome }) 
           if (res.status !== 200) {
             setLoading(false);
             alert("An error occurred. Please try again.");
+            reset();
             return;
           }
           const url = res.data.url;
@@ -83,6 +84,7 @@ const AddPost: FC<AddPostProps> = ({ userName, profileImageUrl, navigateHome }) 
               console.log(response);
               if (response.status === 201) {
                 alert("Post created successfully");
+                reset();
                 navigateHome();
               }
             })
@@ -90,12 +92,14 @@ const AddPost: FC<AddPostProps> = ({ userName, profileImageUrl, navigateHome }) 
               setLoading(false);
               console.error(error);
               alert("An error occurred. Please try again.");
+              reset();
             });
         })
         .catch((err) => {
           setLoading(false);
           console.log(err);
           alert("An error occurred. Please try again.");
+          reset();
         });
     } else {
       setLoading(false);

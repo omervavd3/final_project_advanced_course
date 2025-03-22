@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import avatar from "../assets/icons8-avatar-96.png";
-// import { useNavigate } from "react-router";
 import Post from "./Post";
 import Loader from "./Loader";
 import { useNavigate } from "react-router-dom";
@@ -54,7 +53,6 @@ const EditUser = () => {
   const [showPreviousPassword, setShowPreviousPassword] = useState(false);
   const [userPosts, setUserPosts] = useState<Post[]>([]);
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
-  // const [passwordForDelete, setPasswordForDelete] = useState<string>("");
   const [isUserGoogle, setIsUserGoogle] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
 
@@ -62,13 +60,16 @@ const EditUser = () => {
     setShowPreviousPassword((prev) => !prev);
   };
 
+    
+    
+    
+
   useEffect(() => {
     if (!document.cookie.includes("accessToken")) {
       navigate("/");
     }
-    setLoading(true);
-    const loadPageInfo = async () => {
-      await axios
+      setLoading(true);
+       axios
         .get("https://node38.cs.colman.ac.il/auth/getUserInfo", {
           withCredentials: true,
           headers: {
@@ -84,16 +85,13 @@ const EditUser = () => {
           setUpdateName(response.data.userName);
           setUpdateEmail(response.data.email);
           setIsUserGoogle(response.data.isGoogleSignIn);
-          // if (response.data.isGoogleSignIn) {
-          //   setPasswordForDelete("google-signin");
-          // }
         })
         .catch((error) => {
           console.error(error);
           setProfileImage("");
         });
 
-      await axios
+       axios
         .post(
           "https://node38.cs.colman.ac.il/posts/getByUserId",
           {},
@@ -115,9 +113,8 @@ const EditUser = () => {
           console.error(error);
           setUserPosts([]);
         });
-    };
-    loadPageInfo();
-  }, []);
+  }, [])
+  
 
   const changeUpdateImage = (e: any) => {
     console.log(e.target.files[0]);
@@ -190,7 +187,6 @@ const EditUser = () => {
     setLoading(true);
     await axios
       .delete("https://node38.cs.colman.ac.il/auth/deleteUser", {
-        // data: { password: passwordForDelete },
         headers: {
           Authorization: `Bearer ${
             document.cookie.split("accessToken=")[1].split(";")[0]
@@ -304,7 +300,7 @@ const EditUser = () => {
                           value={updateName}
                           {...register("userName")}
                           onChange={(e) => setUpdateName(e.target.value)}
-                        />
+                          />
                         {errors.userName && (
                           <div className="invalid-feedback">
                             {errors.userName.message}
