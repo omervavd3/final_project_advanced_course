@@ -48,6 +48,14 @@ export const deleteFile = (req: Request, res: Response) => {
     }
 
     filePath = filePath.replace("src\\", "").replace(/\\/g, "/");
+    filePath = filePath.replace(/\\/g, "/"); 
+    filePath = filePath.replace(/\/src\/controllers/, '/');
+
+    // filePath = filePath.replace(/src\//, ""); 
+    // filePath = filePath.replace(/\/controllers\.\./, '/');
+
+
+
     filePath = filePath.replace(/dist\/src\//, "").replace(/\\/g, "/");
 
     console.log("File path to delete:", filePath);

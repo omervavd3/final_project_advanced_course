@@ -193,4 +193,17 @@ describe("User Middlewares Tests", () => {
       })
     expect(res.statusCode).toBe(200);
   });
+
+  test("Test getUserInfo", async () => {
+    const user = await UserModel.findById(testUser2._id)
+    if(user) {
+      user.password = "google-signin"
+    }
+    const res = await request(app)
+      .get("/auth/getUserInfo")
+      .set({
+        Authorization: `JWT ${testUser2.accessToken}`,
+      })
+    expect(res.statusCode).toBe(200);
+  });
 });
